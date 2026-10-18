@@ -25,7 +25,24 @@ import {
   Share2,
   Clock,
   Flame,
-  Award
+  Award,
+  Sun,
+  Calculator,
+  Users,
+  Landmark,
+  BadgePercent,
+  X,
+  Sliders,
+  CheckCircle,
+  FileCheck2,
+  AlertCircle,
+  ShieldAlert,
+  Percent,
+  Printer,
+  QrCode,
+  ArrowRight,
+  Filter,
+  Plus,
 } from 'lucide-react';
 import { EnterpriseProfile } from '../ProfilePage';
 import { useLanguage } from '../../context/LanguageContext';
@@ -33,6 +50,30 @@ import { useLanguage } from '../../context/LanguageContext';
 interface ComplianceScorePageProps {
   profile: EnterpriseProfile;
   onReturnToDashboard: () => void;
+  initialTab?: ComplianceTab;
+}
+
+export type ComplianceTab =
+  | 'overview'
+  | 'engine'
+  | 'zed'
+  | 'capital'
+  | 'subsidies'
+  | 'checklist'
+  | 'dossier';
+
+interface StatutoryTask {
+  id: string;
+  authority: string;
+  authorityIcon: 'gstn' | 'epfo' | 'state' | 'cpcb' | 'spcb' | 'fire';
+  authorityColor: string;
+  taskTitle: string;
+  taskDescription: string;
+  deadline: string;
+  isUrgent?: boolean;
+  status: 'Urgent' | 'Pending' | 'Complied';
+  receiptNumber?: string;
+  filingType: string;
 }
 
 interface ChecklistItem {
@@ -48,43 +89,118 @@ interface ChecklistItem {
   checked: boolean;
 }
 
-interface GovtRegulation {
+interface GovtScheme {
   id: string;
-  ministry: string;
+  name: string;
+  agency: string;
+  category: 'solar' | 'efficiency' | 'credit' | 'grant';
+  badge: string;
   badgeColor: string;
-  notificationNumber: string;
-  date: string;
-  title: string;
-  synopsis: string[];
-  effectiveDate: string;
-  impactLevel: 'CRITICAL' | 'HIGH' | 'MODERATE';
-  sectorsAffected: string[];
-  loopGridSupport: string;
-}
-
-interface LowCostHack {
-  title: string;
-  category: string;
-  equipmentCost: string;
-  monthlySavings: string;
-  paybackPeriod: string;
-  environmentalBenefit: string;
-  governmentSubsidy: string;
-  stepByStepAction: string[];
+  headline: string;
+  description: string;
+  subsidyRate: string;
+  concessionalRate: string;
+  maxAmount: string;
+  collateral: string;
+  speed: string;
+  eligibility: string;
+  keyBenefits: string[];
 }
 
 export const ComplianceScorePage: React.FC<ComplianceScorePageProps> = ({
   profile,
   onReturnToDashboard,
+  initialTab = 'overview',
 }) => {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<'assessment' | 'regulations' | 'implementation' | 'low-cost-hacks'>('assessment');
-  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<'ALL' | 'hazardous' | 'epr' | 'air_water' | 'energy' | 'safety'>('ALL');
-  const [expandedRegulationId, setExpandedRegulationId] = useState<string | null>('reg-01');
+  const [activeTab, setActiveTab] = useState<ComplianceTab>(initialTab);
 
-  // Interactive Assessment Checklist items with exact mathematical weights
+  // In-app feedback toast notification
+  const [toast, setToast] = useState<{ title: string; message: string; type: 'success' | 'info' } | null>(null);
+
+  const showToast = (title: string, message: string, type: 'success' | 'info' = 'success') => {
+    setToast({ title, message, type });
+    setTimeout(() => setToast(null), 4500);
+  };
+
+  // Statutory Compliance Tasks Engine
+  const [tasks, setTasks] = useState<StatutoryTask[]>([
+    {
+      id: 'task-1',
+      authority: 'GSTN',
+      authorityIcon: 'gstn',
+      authorityColor: 'bg-sky-50 text-sky-700 border-sky-200',
+      taskTitle: 'GSTR-3B Monthly Return',
+      taskDescription: 'Monthly self-declaration of outward secondary scrap sales & input tax credit reconciliations.',
+      deadline: 'Today',
+      isUrgent: true,
+      status: 'Urgent',
+      filingType: 'Tax Reconciliation',
+    },
+    {
+      id: 'task-2',
+      authority: 'EPFO',
+      authorityIcon: 'epfo',
+      authorityColor: 'bg-amber-50 text-amber-700 border-amber-200',
+      taskTitle: 'Provident Fund Chalan Generation',
+      taskDescription: 'Statutory ECR chalan generation for shop-floor machinists and secondary material handlers.',
+      deadline: 'Nov 15, 2026',
+      status: 'Pending',
+      filingType: 'Labor Compliance',
+    },
+    {
+      id: 'task-3',
+      authority: 'State Govt',
+      authorityIcon: 'state',
+      authorityColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      taskTitle: 'Factory License Renewal',
+      taskDescription: 'Annual Department of Factories & Boilers operational manufacturing compliance renewal.',
+      deadline: 'Oct 01, 2026',
+      status: 'Complied',
+      receiptNumber: 'REC-KA-FAC-2026-9921',
+      filingType: 'Statutory License',
+    },
+    {
+      id: 'task-4',
+      authority: 'CPCB',
+      authorityIcon: 'cpcb',
+      authorityColor: 'bg-teal-50 text-teal-700 border-teal-200',
+      taskTitle: 'Form-10 Hazardous Scrap Movement Manifest',
+      taskDescription: 'Centralized manifest tracking for physical industrial scrap transported to authorized smelters.',
+      deadline: 'Weekly Cycle',
+      status: 'Complied',
+      receiptNumber: 'CPCB-MAN-88102',
+      filingType: 'Hazardous Waste',
+    },
+    {
+      id: 'task-5',
+      authority: 'SPCB',
+      authorityIcon: 'spcb',
+      authorityColor: 'bg-purple-50 text-purple-700 border-purple-200',
+      taskTitle: 'Consent to Operate (CTO) Air & Water Renewal',
+      taskDescription: 'Triennial State Pollution Control Board emission & effluent discharge compliance validation.',
+      deadline: 'Dec 31, 2026',
+      status: 'Pending',
+      filingType: 'Environmental Consent',
+    },
+    {
+      id: 'task-6',
+      authority: 'Fire Dept',
+      authorityIcon: 'fire',
+      authorityColor: 'bg-rose-50 text-rose-700 border-rose-200',
+      taskTitle: 'Industrial Fire Safety NOC Audit',
+      taskDescription: 'Annual inspection certificate for spark arrestors, hydrants, and chip centrifuge drainage.',
+      deadline: 'Jan 15, 2027',
+      status: 'Complied',
+      receiptNumber: 'FSNOC-BLR-2026-4410',
+      filingType: 'Safety Clearance',
+    },
+  ]);
+
+  const [engineFilter, setEngineFilter] = useState<'all' | 'urgent' | 'pending' | 'complied'>('all');
+
+  // Interactive 100-Point Checklist
   const [checklist, setChecklist] = useState<ChecklistItem[]>([
-    // Category 1: Hazardous Waste & Scrap Segregation (25 Points)
     {
       id: 'chk-01',
       category: 'hazardous',
@@ -133,8 +249,6 @@ export const ComplianceScorePage: React.FC<ComplianceScorePageProps> = ({
       lowCostImplementation: 'Refurbished 200L HDPE drums painted green/blue/yellow with stencil markings (₹800/bin).',
       checked: true,
     },
-
-    // Category 2: Extended Producer Responsibility (EPR) & Digital Traceability (25 Points)
     {
       id: 'chk-05',
       category: 'epr',
@@ -183,8 +297,6 @@ export const ComplianceScorePage: React.FC<ComplianceScorePageProps> = ({
       lowCostImplementation: 'Order pre-tested, standardized LoopGrid pooled lots with guaranteed metallurgical specs.',
       checked: true,
     },
-
-    // Category 3: Air & Water Consents & Effluent Monitoring (20 Points)
     {
       id: 'chk-09',
       category: 'air_water',
@@ -201,606 +313,1432 @@ export const ComplianceScorePage: React.FC<ComplianceScorePageProps> = ({
       id: 'chk-10',
       category: 'air_water',
       categoryLabel: 'Air & Water Statutory Consents',
-      title: 'Zero Discharge of Water Soluble Cutting Fluids',
-      regulationCode: 'General Effluent Standards GSR 422(E)',
+      title: 'Oil-Water Separator / Sump Trap on Wash bays',
+      regulationCode: 'CPCB Guidelines for Machining Effluents',
       points: 7,
-      description: 'Prohibition of disposing used synthetic/mineral coolants into municipal drainage. Closed-loop recovery or authorized disposal.',
-      operationalEfficiencyTip: 'Filtration and tramp-oil skimming extends coolant sump life from 3 weeks to over 6 months.',
-      lowCostImplementation: 'Install an air-driven tramp-oil skimmer (₹4,500). Saves ₹28,000/year in fresh coolant purchases.',
-      checked: false,
+      description: 'Gravity-fed skimming trap to recover insoluble tramp oils from floor wash and CNC coolant spills before municipal discharge.',
+      operationalEfficiencyTip: 'Prevents toxic coolant discharge, avoiding SPCB closure notices and heavy water pollution penalties.',
+      lowCostImplementation: 'Fabricate a 3-chamber baffle drum separator using local scrap sheet metal for ~₹4,500.',
+      checked: true,
     },
     {
       id: 'chk-11',
-      category: 'air_water',
-      categoryLabel: 'Air & Water Statutory Consents',
-      title: 'Ambient Particulate Matter (PM10/PM2.5) Air Monitoring',
-      regulationCode: 'National Ambient Air Quality Standards (NAAQS)',
+      category: 'energy',
+      categoryLabel: 'Energy Efficiency & Clean Fuel Transition',
+      title: 'Power Factor Correction (APFC Panel) Maintenance',
+      regulationCode: 'Electricity Act 2003 / State DISCOM Tariff Regulations',
       points: 6,
-      description: 'Periodic stack emission test for smelting furnaces or extraction cyclone maintenance for dry swarf machining.',
-      operationalEfficiencyTip: 'Clean air ducts minimize worker absenteeism caused by respiratory issues and prevent motor overheating.',
-      lowCostImplementation: 'Fabricate local centrifugal duct filters with washable polyester sleeves instead of proprietary HEPA units.',
+      description: 'Maintaining factory electrical power factor above 0.98 lagging to avoid DISCOM penalty surcharges.',
+      operationalEfficiencyTip: 'DISCOMs in Karnataka, Gujarat, and Tamil Nadu offer a 1.5% to 3.0% bill rebate for maintaining >0.98 PF.',
+      lowCostImplementation: 'Install automated APFC capacitor banks; payback is typically under 4 months.',
       checked: true,
     },
-
-    // Category 4: Energy Efficiency & Decarbonization (15 Points)
     {
       id: 'chk-12',
       category: 'energy',
-      categoryLabel: 'Energy Efficiency & Decarbonization',
-      title: 'Variable Frequency Drives (VFD) & Power Factor Optimization',
-      regulationCode: 'Energy Conservation Act 2001 / BEE MSME Scheme',
-      points: 5,
-      description: 'Maintaining factory power factor >0.98 and equipping high-load CNC hydraulic pumps and blowers with VFDs.',
-      operationalEfficiencyTip: 'Eliminates electricity board low power factor penalty and earns a 1.5% prompt rebate on monthly power bill.',
-      lowCostImplementation: 'Install automatic power factor correction (APFC) capacitor bank. Immediate 2-month payback.',
+      categoryLabel: 'Energy Efficiency & Clean Fuel Transition',
+      title: 'Variable Frequency Drives (VFD) on Blowers & Compressors',
+      regulationCode: 'Bureau of Energy Efficiency (BEE) MSME Guidelines',
+      points: 6,
+      description: 'Speed regulation on electric motors matching real-time air demands rather than full-throttle continuous idling.',
+      operationalEfficiencyTip: 'Cuts motor power draw by 28%, directly shaving ₹8,000 to ₹18,000 from monthly electricity bills.',
+      lowCostImplementation: 'Avail SIDBI STAR subvention finance to cover 90% of equipment retrofit cost.',
       checked: true,
     },
     {
       id: 'chk-13',
-      category: 'energy',
-      categoryLabel: 'Energy Efficiency & Decarbonization',
-      title: 'Furnace Insulation & Waste Heat Recovery (Smelters/Foundries)',
-      regulationCode: 'BEE Thermal Energy Efficiency Benchmark',
+      category: 'safety',
+      categoryLabel: 'Worker Safety & Industrial Hygiene',
+      title: 'PPE Provision & Coolant Dermatitis Prevention',
+      regulationCode: 'Factories Act 1948 (Section 41-C)',
       points: 5,
-      description: 'Ceramic fiber blanket lining on secondary melting furnaces to reduce shell radiation losses below 5%.',
-      operationalEfficiencyTip: 'Cuts LPG/diesel melting fuel consumption by 18% per ton of molten metal tapped.',
-      lowCostImplementation: 'Retrofit ceramic refractory coating over existing brickwork (₹8,000 total material cost).',
-      checked: false,
+      description: 'Providing neoprene barrier gloves, splash goggles, and machine chip guards for metal cutting operators.',
+      operationalEfficiencyTip: 'Prevents worker downtime and medical compensation claims.',
+      lowCostImplementation: 'Bulk procurement through Udyam MSME cluster consortiums at 35% discount.',
+      checked: true,
     },
     {
       id: 'chk-14',
-      category: 'energy',
-      categoryLabel: 'Energy Efficiency & Decarbonization',
-      title: 'Rooftop Solar PV or Green Power Wheeling Participation',
-      regulationCode: 'Green Energy Open Access Rules 2022',
-      points: 5,
-      description: 'Offsetting minimum 20% of daytime connected machinery load with clean solar renewable energy.',
-      operationalEfficiencyTip: 'Locks in levelized electricity tariff at ₹3.80/kWh vs commercial grid tariff of ₹8.40/kWh.',
-      lowCostImplementation: 'Apply for Ministry of MNRE 40% capital subsidy for MSME industrial rooftop solar.',
-      checked: true,
-    },
-
-    // Category 5: Occupational Safety, PPE & ZED Standards (15 Points)
-    {
-      id: 'chk-15',
       category: 'safety',
-      categoryLabel: 'Occupational Safety & ZED Certification',
-      title: 'Mandatory PPE for Scrap Sorting & Metal Machining',
-      regulationCode: 'Factories Act 1948 Section 41F',
+      categoryLabel: 'Worker Safety & Industrial Hygiene',
+      title: 'Scrap Chip Crushers & Swarf Centrifuge Spin-Dryers',
+      regulationCode: 'Occupational Safety and Health Code 2020',
       points: 5,
-      description: 'Enforcement of level-5 cut-resistant Kevlar gloves, steel-toe footwear, and eye protection during metal offcut handling.',
-      operationalEfficiencyTip: 'Reduces shop-floor lost-time injury (LTI) frequency to zero, lowering workmen compensation insurance premiums.',
-      lowCostImplementation: 'Bulk purchase certified cut-resistant gloves in bulk from MSME safety syndicates (₹95/pair).',
-      checked: true,
-    },
-    {
-      id: 'chk-16',
-      category: 'safety',
-      categoryLabel: 'Occupational Safety & ZED Certification',
-      title: 'MSME Zero Defect Zero Effect (ZED) Certification',
-      regulationCode: 'Ministry of MSME ZED Scheme 2022',
-      points: 5,
-      description: 'Formal bronze, silver, or gold accreditation verifying environmental responsibility and production quality.',
-      operationalEfficiencyTip: 'Grants 0.50% interest concession on all working capital bank loans and priority public procurement tenders.',
-      lowCostImplementation: 'Ministry pays 80% subsidy for micro enterprises, 60% for small enterprises on certification costs.',
-      checked: true,
-    },
-    {
-      id: 'chk-17',
-      category: 'safety',
-      categoryLabel: 'Occupational Safety & ZED Certification',
-      title: 'Emergency Eye-Wash & Secondary Spill Kits',
-      regulationCode: 'Occupational Safety, Health and Working Conditions Code 2020',
-      points: 5,
-      description: 'Readily accessible neutralizing eyewash stations and absorbent sand/sawdust spill kits near chemical/coolant storage.',
-      operationalEfficiencyTip: 'Prevents minor spill containment from turning into an expensive SPCB show-cause notice.',
-      lowCostImplementation: 'DIY mobile spill station utilizing dedicated dry sawdust bins and HDPE wall-mounted squeeze eyewash bottles (₹1,200).',
-      checked: true,
+      description: 'Centrifugal spinning of wet metal swarf to extract up to 98% of adhering cutting oil for reuse.',
+      operationalEfficiencyTip: 'Recovers 120-200 Liters of neat cutting oil per month (Saving ₹36,000/mo) and doubles scrap dry value.',
+      lowCostImplementation: 'Lease a compact batch centrifuge with SIDBI Green Financing.',
+      checked: false,
     },
   ]);
 
-  // Real-time Government Regulations Feed
-  const regulationsFeed: GovtRegulation[] = [
-    {
-      id: 'reg-01',
-      ministry: 'CPCB / MoEFCC',
-      badgeColor: 'bg-red-50 text-red-700 border-red-200',
-      notificationNumber: 'Notification F.No. 12-28/2024-HSMD',
-      date: 'Gazetted: Oct 04, 2026',
-      title: 'Mandatory Digital QR-Coded Movement Manifest for Non-Ferrous Scrap',
-      synopsis: [
-        'All industrial machine shops generating more than 200 kg of non-ferrous metal scrap (Aluminum, Copper, Brass, Zinc) per month must generate an electronic Form 10 movement document with a tamper-proof QR code before dispatch.',
-        'Paper delivery challans will no longer be considered valid proof of safe disposal during SPCB transit checks.',
-        'Vehicles found transporting scrap without digital consignment registration are liable for impoundment and compounding fines up to ₹50,000.',
-      ],
-      effectiveDate: 'Enforced from November 01, 2026',
-      impactLevel: 'CRITICAL',
-      sectorsAffected: ['Automotive Ancillaries', 'CNC Turning Units', 'Secondary Smelters', 'Transit Carriers'],
-      loopGridSupport: 'LoopGrid automatically embeds the required MoEFCC digital QR code directly onto every Digital Resource Passport (DRP). Zero additional paperwork needed.',
-    },
-    {
-      id: 'reg-02',
-      ministry: 'Ministry of Finance / CBIC',
-      badgeColor: 'bg-amber-50 text-amber-700 border-amber-200',
-      notificationNumber: 'CBIC Circular No. 238/2026-GST',
-      date: 'Issued: Sep 22, 2026',
-      title: 'Clarification on RCM (Reverse Charge Mechanism) on Secondary Scrap Lots',
-      synopsis: [
-        'Where scrap is sold by an unregistered MSME to a registered processing enterprise, GST shall be payable under Reverse Charge Mechanism (RCM) by the purchasing smelter at 18%.',
-        'Registered MSME units with valid GSTIN can sell under forward charge with 2% TDS deduction under Section 194Q.',
-        'Requires clear material assay classification code (HSN 7602 for Aluminum scrap) on all invoices to avoid input tax credit (ITC) blockages.',
-      ],
-      effectiveDate: 'Effective Immediately',
-      impactLevel: 'HIGH',
-      sectorsAffected: ['All Scrap Generators', 'Foundries', 'Factoring & Banking Partners'],
-      loopGridSupport: 'Automated invoice generator with validated HSN codes and direct integration with buyer escrow for transparent tax compliance.',
-    },
-    {
-      id: 'reg-03',
-      ministry: 'Central Pollution Control Board (CPCB)',
-      badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-      notificationNumber: 'CPCB Circular B-29016/EPR-Metals/2026',
-      date: 'Published: Sep 10, 2026',
-      title: 'Incentive Framework for Recycled Aluminum Ingot Content in Auto Castings',
-      synopsis: [
-        'Automotive OEM suppliers utilizing more than 35% certified recycled aluminum secondary ingot are granted fast-track green clearances and priority access to national EV component production-linked subsidies.',
-        'Requires accredited traceability showing secondary scrap origin from verified regional machine shops.',
-      ],
-      effectiveDate: 'Financial Year 2026-2027',
-      impactLevel: 'MODERATE',
-      sectorsAffected: ['Die Casters', 'CNC Machining Units', 'Foundry Smelters'],
-      loopGridSupport: 'Provides digital provenance certificates that auto components manufacturers can submit to OEMs to claim premium green pricing.',
-    },
-    {
-      id: 'reg-04',
-      ministry: 'Ministry of MSME / BEE',
-      badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
-      notificationNumber: 'MSME/BEE/Energy-EE/44/2026',
-      date: 'Published: Aug 28, 2026',
-      title: 'Energy Efficiency Capital Subsidy Scheme for Secondary Induction Furnaces',
-      synopsis: [
-        'Secondary metallurgical processing units installing energy-efficient thyristor power packs or ceramic thermal insulation are eligible for a 35% direct capital grant up to ₹15 Lakhs.',
-        'Targeted at reducing average melting kWh per ton of aluminum from 620 kWh to under 510 kWh.',
-      ],
-      effectiveDate: 'Applications Open until Dec 31, 2026',
-      impactLevel: 'HIGH',
-      sectorsAffected: ['Secondary Smelters', 'Ingot Casting Foundries'],
-      loopGridSupport: 'Pre-formatted energy audit baseline templates accepted by BEE regional offices for instant grant approval.',
-    },
-  ];
+  // Checklist Category Filter
+  const [checklistFilter, setChecklistFilter] = useState<'all' | 'hazardous' | 'epr' | 'air_water' | 'energy' | 'safety'>('all');
 
-  // Low-Cost Compliance & Profitability Blueprints
-  const lowCostHacks: LowCostHack[] = [
-    {
-      title: 'Centrifugal Chip Spinner & Coolant Reclaimer',
-      category: 'Hazardous Waste & Coolant Management',
-      equipmentCost: '₹22,000 (Low-Cost Local Fabricated Spinner)',
-      monthlySavings: '₹14,200 per month (Coolant + Scrap Premium)',
-      paybackPeriod: '1.5 Months Payback',
-      environmentalBenefit: 'Eliminates 100% of hazardous oil dripping from scrap bins, passing SPCB unannounced inspections.',
-      governmentSubsidy: 'Up to 50% under MSME Tool Room Scheme',
-      stepByStepAction: [
-        'Place aluminum or steel CNC turning swarf into the basket spinner before dumping into scrap storage bins.',
-        'Centrifugal rotation spins out 95% of adhering neat cutting oil in 2 minutes.',
-        'Filter reclaimed oil through a 10-micron cartridge and pour back into machine sump.',
-        'Result: Bone-dry metal scrap fetches ₹14/kg extra from foundries + saves 120 liters of fresh cutting oil monthly.',
-      ],
-    },
-    {
-      title: 'Micro-Briquetting of Aluminum Swarf into Dense Pucks',
-      category: 'Thermal Melting & Air Quality',
-      equipmentCost: '₹0 Capital Outlay (Shared LoopGrid Cluster Briquetter)',
-      monthlySavings: '₹38,000 per ton smelted',
-      paybackPeriod: 'Immediate (Pay-per-use ₹1.20/kg)',
-      environmentalBenefit: 'Stops particulate swarf fly-loss in induction furnaces, complying with stack air quality norms.',
-      governmentSubsidy: 'Zero GST on green cluster processing',
-      stepByStepAction: [
-        'Loose swarf burns and oxidizes up to 12% in the melting furnace, generating heavy dross and polluting smoke.',
-        'Compressing into solid 90% dense briquette pucks cuts oxidation burn-loss from 12% to under 2.5%.',
-        'Produces clean, dense charges with 25% faster melt times and zero black smoke.',
-      ],
-    },
-    {
-      title: 'MSME ZED Scheme Certification for 0.50% Bank Interest Concession',
-      category: 'Statutory Certification & Banking',
-      equipmentCost: '₹6,000 (After 80% Ministry Subsidy)',
-      monthlySavings: '₹24,500 per month on working capital interest',
-      paybackPeriod: '14 Days Payback',
-      environmentalBenefit: 'Standardized zero-defect production methodology with formal third-party green verification.',
-      governmentSubsidy: '80% subsidy on certification fees by Ministry of MSME',
-      stepByStepAction: [
-        'Apply on the official zed.msme.gov.in portal using Udyam Registration number.',
-        'Upload shop-floor safety PPE photos, Form 10 digital manifest logs, and waste segregation bins.',
-        'Obtain Bronze/Silver ZED certificate in 10 business days.',
-        'Submit certificate to your lending bank (Canara, SBI, PNB, SIDBI) to immediately knock 0.50% off loan interest.',
-      ],
-    },
-    {
-      title: 'Air-Driven Tramp Oil Belt Skimmer',
-      category: 'Water Pollution & Coolant Longevity',
-      equipmentCost: '₹4,800 (Compact Magnetic / Poly Belt Unit)',
-      monthlySavings: '₹8,400 per month in chemical disposal',
-      paybackPeriod: '3 Weeks Payback',
-      environmentalBenefit: 'Prevents bacterial anaerobic decay of machine coolants, stopping foul odors and toxic disposal.',
-      governmentSubsidy: 'Tax 100% accelerated depreciation in Year 1',
-      stepByStepAction: [
-        'Tramp hydraulic oil floating on coolant creates anaerobic bacteria and noxious sulfur odors.',
-        'Mount small belt skimmer on the coolant tank rim. It continuously wipes off surface oil into a waste jug.',
-        'Extends coolant sump life from 4 weeks to 28 weeks.',
-        'Eliminates need for costly hazardous effluent waste tanker pickups.',
-      ],
-    },
-  ];
+  // Green Capital Simulator States
+  const [capitalAmountLakhs, setCapitalAmountLakhs] = useState<number>(150); // ₹150 Lakhs
+  const [repaymentTenureYears, setRepaymentTenureYears] = useState<number>(5); // 5 Years
+  const [capitalPurpose, setCapitalPurpose] = useState<'solar' | 'etp' | 'furnace' | 'machinery'>('solar');
+  const subsidizedInterestRate = 7.5; // 7.5% Subsidized Concessional Rate
+  const commercialInterestRate = 11.2; // 11.2% Standard Commercial Benchmark
 
-  // Mathematical Calculation of the Score:
-  // Total achievable points = 100
-  // Each item has defined points based on statutory severity.
-  const totalPossiblePoints = useMemo(() => {
-    return checklist.reduce((sum, item) => sum + item.points, 0);
+  // Modal states
+  const [filingSuccessModal, setFilingSuccessModal] = useState<StatutoryTask | null>(null);
+  const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
+  const [applySchemeModal, setApplySchemeModal] = useState<GovtScheme | null>(null);
+  const [zedUpgradeModalOpen, setZedUpgradeModalOpen] = useState(false);
+  const [zedInfoModalOpen, setZedInfoModalOpen] = useState(false);
+  const [schemeDetailModal, setSchemeDetailModal] = useState<GovtScheme | null>(null);
+
+  // Compute live compliance score
+  const totalPoints = useMemo(() => {
+    return checklist.reduce((sum, item) => sum + (item.checked ? item.points : 0), 0);
   }, [checklist]);
 
-  const currentScore = useMemo(() => {
-    return checklist
-      .filter((item) => item.checked)
-      .reduce((sum, item) => sum + item.points, 0);
-  }, [checklist]);
+  const maxPoints = 88;
+  const complianceHealthPercent = Math.min(100, Math.round((totalPoints / maxPoints) * 100));
 
-  // Score percentage and category breakdowns
-  const scorePercentage = Math.round((currentScore / totalPossiblePoints) * 100);
+  // Compute Monthly EMI & Savings
+  const calculationResults = useMemo(() => {
+    const P = capitalAmountLakhs * 100000;
+    const n = repaymentTenureYears * 12;
 
-  const categoryBreakdown = useMemo(() => {
-    const categories: Record<string, { label: string; current: number; total: number }> = {
-      hazardous: { label: 'Hazardous Waste & Scrap', current: 0, total: 0 },
-      epr: { label: 'EPR & DRP Traceability', current: 0, total: 0 },
-      air_water: { label: 'Air & Water Consents', current: 0, total: 0 },
-      energy: { label: 'Energy & Decarbonization', current: 0, total: 0 },
-      safety: { label: 'Worker Safety & ZED', current: 0, total: 0 },
+    // Subsidized Rate (7.5%)
+    const rSub = subsidizedInterestRate / 100 / 12;
+    const emiSub = (P * rSub * Math.pow(1 + rSub, n)) / (Math.pow(1 + rSub, n) - 1);
+    const totalSubsidizedPaid = emiSub * n;
+
+    // Commercial Rate (11.2%)
+    const rComm = commercialInterestRate / 100 / 12;
+    const emiComm = (P * rComm * Math.pow(1 + rComm, n)) / (Math.pow(1 + rComm, n) - 1);
+    const totalCommercialPaid = emiComm * n;
+
+    const totalInterestSaved = Math.max(0, totalCommercialPaid - totalSubsidizedPaid);
+
+    return {
+      monthlyEMI: Math.round(emiSub),
+      commercialEMI: Math.round(emiComm),
+      totalSubsidizedPaid: Math.round(totalSubsidizedPaid),
+      totalCommercialPaid: Math.round(totalCommercialPaid),
+      totalInterestSaved: Math.round(totalInterestSaved),
     };
+  }, [capitalAmountLakhs, repaymentTenureYears]);
 
-    checklist.forEach((item) => {
-      categories[item.category].total += item.points;
-      if (item.checked) {
-        categories[item.category].current += item.points;
-      }
+  // Government Green Transmission Schemes Directory
+  const govtSchemes: GovtScheme[] = [
+    {
+      id: 'sch-sidbi-4e',
+      name: 'SIDBI 4E (End to End Energy Efficiency)',
+      agency: 'Small Industries Development Bank of India (SIDBI)',
+      category: 'efficiency',
+      badge: 'TOP CONCESSIONAL RATE',
+      badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      headline: 'Term loan up to ₹500 Lakhs covering 90% of equipment cost for industrial energy-saving retrofits.',
+      description: 'Comprehensive scheme offering concessional loans for replacing low-efficiency motors, furnaces, compressors, and boilers with BEE 5-star or high-efficiency units.',
+      subsidyRate: '2% Interest Subvention',
+      concessionalRate: '7.00% - 7.50% p.a.',
+      maxAmount: 'Up to ₹500 Lakhs',
+      collateral: 'Asset hypothecation + CGTMSE cover available',
+      speed: 'T+5 Days Fast-Track Sanction',
+      eligibility: 'Udyam-registered MSMEs operational for at least 2 years with positive net worth.',
+      keyBenefits: [
+        'Covers up to 90% of technical project expenditure',
+        'Moratorium up to 12 months during installation',
+        'Subsidized BEE energy audit report reimbursement up to ₹50,000',
+      ],
+    },
+    {
+      id: 'sch-sidbi-speed',
+      name: 'SIDBI SPEED (Solar Power Eco-Efficiency Drive)',
+      agency: 'SIDBI & Ministry of New and Renewable Energy',
+      category: 'solar',
+      badge: '100% FINANCING',
+      badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+      headline: '100% debt financing for industrial rooftop solar PV installations without third-party collateral.',
+      description: 'Designed specifically to help MSME factories lower electrical operating expenses by generating captive clean power on factory rooftops.',
+      subsidyRate: 'Zero Processing Fee + Direct Capital Offset',
+      concessionalRate: '7.25% - 7.75% p.a.',
+      maxAmount: 'Up to ₹100 Lakhs (New Units) / ₹200 Lakhs (Existing)',
+      collateral: 'Zero Collateral Required (Solar Plant Hypothecation only)',
+      speed: 'T+48 Hours Automated Sanction',
+      eligibility: 'Manufacturing MSMEs with factory roof ownership or long-term registered lease.',
+      keyBenefits: [
+        '100% financing with zero promoter margin money needed',
+        'Repayment tenure up to 7 years with seasonal flexibility',
+        'Direct net metering integration with state DISCOMs',
+      ],
+    },
+    {
+      id: 'sch-cgtmse-green',
+      name: 'CGTMSE Green Credit Guarantee Scheme',
+      agency: 'Credit Guarantee Fund Trust for Micro and Small Enterprises',
+      category: 'credit',
+      badge: '100% COLLATERAL-FREE',
+      badgeColor: 'bg-blue-50 text-blue-800 border-blue-200',
+      headline: 'Complete 100% sovereign credit guarantee for MSME loans up to ₹5 Crores for green investments.',
+      description: 'Enables Indian MSMEs to secure bank credit for Zero Defect Zero Effect (ZED) compliance, Effluent Treatment Plants (ETP), and circular manufacturing without mortgaging personal property.',
+      subsidyRate: '100% Guarantee Cover (No Collateral)',
+      concessionalRate: 'Standard Bank MCLR - 0.75%',
+      maxAmount: 'Up to ₹500 Lakhs (₹5 Crores)',
+      collateral: 'None (CGTMSE Trust provides full sovereign guarantee)',
+      speed: 'Single Window Digital Approval',
+      eligibility: 'All Micro and Small manufacturing enterprises with valid Udyam registration and ZED Bronze or higher.',
+      keyBenefits: [
+        'Banks cannot demand third-party guarantees or residential collateral',
+        'Reduced annual guarantee fee of only 0.37% for green borrowers',
+        'Covers term loans as well as working capital limits',
+      ],
+    },
+    {
+      id: 'sch-clcss-green',
+      name: 'Credit Linked Capital Subsidy Scheme (CLCSS)',
+      agency: 'Ministry of MSME, Government of India',
+      category: 'grant',
+      badge: 'UPFRONT CAPITAL GRANT',
+      badgeColor: 'bg-purple-50 text-purple-800 border-purple-200',
+      headline: '15% upfront direct capital subsidy (up to ₹15 Lakhs) for technological modernization.',
+      description: 'Direct cash grant deposited into the MSME bank account for upgrading old machinery to cleaner, low-emission, and energy-conserving technology variants.',
+      subsidyRate: '15% Direct Upfront Cash Grant',
+      concessionalRate: 'Standard Project Loan',
+      maxAmount: 'Up to ₹15 Lakhs Capital Subsidy',
+      collateral: 'As per lending bank norms',
+      speed: 'Quarterly nodal disbursement cycle',
+      eligibility: 'Micro and Small enterprises upgrading to government-approved clean technology list.',
+      keyBenefits: [
+        'Non-refundable direct cash injection into loan account',
+        'Approved machinery includes CNC metal swarf centrifuges, modern induction furnaces, and oil recovery skimmers',
+        'Combined with state state industrial development incentives',
+      ],
+    },
+    {
+      id: 'sch-prsf-wb',
+      name: 'PRSF (Partial Risk Sharing Facility)',
+      agency: 'World Bank & SIDBI & Global Environment Facility (GEF)',
+      category: 'efficiency',
+      badge: 'WORLD BANK BACKED',
+      badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+      headline: '75% risk guarantee for energy service performance contracts implemented in manufacturing clusters.',
+      description: 'Risk guarantee facility that backs energy efficiency projects executed via Energy Service Companies (ESCOs), guaranteeing performance savings.',
+      subsidyRate: 'Covers up to 75% loan loss risk',
+      concessionalRate: '7.50% fixed project line',
+      maxAmount: 'Up to ₹300 Lakhs',
+      collateral: 'Performance guarantee backing',
+      speed: 'T+7 Days Cluster Verification',
+      eligibility: 'Enterprises in designated energy-intensive sectors (Foundry, Auto Ancillary, Plastics, Textiles).',
+      keyBenefits: [
+        'Equipment costs paid from generated energy bill savings',
+        'Independent measurement and verification by certified BEE auditors',
+        'Zero upfront cash outflow from the enterprise working capital',
+      ],
+    },
+    {
+      id: 'sch-cpcb-epr',
+      name: 'CPCB EPR Circular Trading Facility',
+      agency: 'Central Pollution Control Board (CPCB)',
+      category: 'grant',
+      badge: 'SECONDARY REVENUE STREAM',
+      badgeColor: 'bg-teal-50 text-teal-800 border-teal-200',
+      headline: 'Monetize verified secondary recycling certificates directly to brand owners needing EPR credits.',
+      description: 'Official framework allowing registered recyclers and secondary material processors to sell Extended Producer Responsibility certificates for recycled plastic and secondary metals.',
+      subsidyRate: 'Market Certificate Value (₹3 - ₹12 per kg)',
+      concessionalRate: 'Trading Platform Credit',
+      maxAmount: 'Unlimited (Based on verified tonnage)',
+      collateral: 'Digital Resource Passport (DRP) Batch Verification',
+      speed: 'Weekly Escrow Settlement',
+      eligibility: 'Processing enterprises and secondary metal recyclers registered on the Central CPCB Portal.',
+      keyBenefits: [
+        'Turns waste documentation into immediate cash flow',
+        'Automated transfer of credits via verified LoopGrid DRP manifests',
+        'Zero legal friction with audited chain of custody',
+      ],
+    },
+  ];
+
+  const filteredSchemes = useMemo(() => {
+    return govtSchemes;
+  }, [govtSchemes]);
+
+  // Handle 1-Click File
+  const handle1ClickFile = (taskId: string) => {
+    const target = tasks.find((t) => t.id === taskId);
+    if (!target) return;
+
+    const generatedReceipt = `ARN-${target.authority}-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === taskId
+          ? {
+              ...t,
+              status: 'Complied',
+              isUrgent: false,
+              receiptNumber: generatedReceipt,
+            }
+          : t
+      )
+    );
+
+    setFilingSuccessModal({
+      ...target,
+      status: 'Complied',
+      receiptNumber: generatedReceipt,
     });
 
-    return categories;
-  }, [checklist]);
+    showToast('Filing Synchronized', `${target.taskTitle} successfully submitted with receipt ${generatedReceipt}!`);
+  };
 
-  // Toggle checklist item
-  const handleToggleChecklist = (id: string) => {
+  const toggleChecklistItem = (id: string) => {
     setChecklist((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, checked: !item.checked } : item
-      )
+      prev.map((item) => {
+        if (item.id === id) {
+          const next = !item.checked;
+          showToast(
+            next ? 'Compliance Fulfilled' : 'Item Marked Pending',
+            `${item.title}: ${next ? '+' + item.points + ' points earned!' : item.points + ' points deducted.'}`,
+            next ? 'success' : 'info'
+          );
+          return { ...item, checked: next };
+        }
+        return item;
+      })
     );
   };
 
-  // Filtered checklist
-  const filteredChecklist = useMemo(() => {
-    if (selectedCategoryFilter === 'ALL') return checklist;
-    return checklist.filter((item) => item.category === selectedCategoryFilter);
-  }, [checklist, selectedCategoryFilter]);
-
-  // Performance Rating tier
-  const getRatingTier = (score: number) => {
-    if (score >= 90) {
-      return {
-        tier: 'Tier-A+ ESG Pioneer',
-        color: 'text-emerald-700 bg-emerald-50 border-emerald-300',
-        barColor: 'from-emerald-500 to-green-600',
-        badge: 'Exemplary Environmental Performance',
-        summary: 'Zero regulatory liability. Eligible for lowest 8.75% bank interest and priority public enterprise procurement.',
-      };
-    }
-    if (score >= 75) {
-      return {
-        tier: 'Tier-A High Compliance',
-        color: 'text-emerald-800 bg-[#EAF8EE] border-[#C8E6C9]',
-        barColor: 'from-emerald-500 to-teal-600',
-        badge: 'Audit-Proof Industrial Operations',
-        summary: 'Fully insulated from SPCB inspection notices. Compliant with CPCB 2026 digital manifest mandates.',
-      };
-    }
-    if (score >= 55) {
-      return {
-        tier: 'Tier-B Moderate Compliance',
-        color: 'text-amber-800 bg-amber-50 border-amber-300',
-        barColor: 'from-amber-400 to-amber-600',
-        badge: 'Action Recommended on 3 Items',
-        summary: 'Minor operational gaps in hazardous waste or effluent documentation. Low risk of immediate compounding fines.',
-      };
-    }
-    return {
-      tier: 'Tier-C Critical Attention Needed',
-      color: 'text-red-700 bg-red-50 border-red-300',
-      barColor: 'from-red-500 to-orange-600',
-      badge: 'High Statutory Risk',
-      summary: 'Action required on core consent renewals or scrap manifest logging to prevent show-cause notices.',
-    };
+  const handleApplyScheme = (scheme: GovtScheme) => {
+    setApplySchemeModal(scheme);
   };
 
-  const currentTier = getRatingTier(currentScore);
+  const handleConfirmSchemeApplication = () => {
+    if (!applySchemeModal) return;
+    const trackingRef = `MSME-GRN-${Math.floor(100000 + Math.random() * 900000)}`;
+    showToast(
+      'Application Submitted',
+      `Your application for ${applySchemeModal.name} was successfully dispatched to the Nodal Agency! Ref: ${trackingRef}`
+    );
+    setApplySchemeModal(null);
+  };
+
+  const handleConfirmZedUpgrade = () => {
+    const zedRef = `ZED-GOLD-${Math.floor(100000 + Math.random() * 900000)}`;
+    showToast(
+      'ZED Gold Application Dispatched',
+      `Application for Gold Tier upgrade submitted to Quality Council of India. Assessor Ref: ${zedRef}`
+    );
+    setZedUpgradeModalOpen(false);
+  };
+
+  // Filter tasks in compliance engine
+  const filteredTasks = useMemo(() => {
+    if (engineFilter === 'all') return tasks;
+    if (engineFilter === 'urgent') return tasks.filter((t) => t.status === 'Urgent');
+    if (engineFilter === 'pending') return tasks.filter((t) => t.status === 'Pending');
+    if (engineFilter === 'complied') return tasks.filter((t) => t.status === 'Complied');
+    return tasks;
+  }, [tasks, engineFilter]);
+
+  // Filter checklist items
+  const filteredChecklist = useMemo(() => {
+    if (checklistFilter === 'all') return checklist;
+    return checklist.filter((item) => item.category === checklistFilter);
+  }, [checklist, checklistFilter]);
+
+  const urgentCount = tasks.filter((t) => t.status === 'Urgent').length;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#191C1E] flex flex-col font-sans selection:bg-[#E8F5E9] selection:text-[#1B5E20]">
-      {/* Top Application Header Bar */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-neutral-100 shadow-xs">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={onReturnToDashboard}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-neutral-700 hover:text-[#1B5E20] transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
-            <span>{t.compliance.returnBtn}</span>
-          </button>
+    <div className="min-h-screen bg-[#F8FAFC] text-[#191C1E] flex flex-col font-sans pb-24 animate-fade-in selection:bg-emerald-100 selection:text-emerald-900">
+      {/* Toast Notification Alert */}
+      {toast && (
+        <div className="fixed top-5 right-5 z-50 max-w-sm w-full bg-white rounded-2xl shadow-xl border border-neutral-200 p-4 animate-in slide-in-from-top-4 duration-200">
+          <div className="flex items-start gap-3">
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              toast.type === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-sky-50 text-sky-600'
+            }`}>
+              {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <Info className="w-5 h-5" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="text-xs font-bold text-neutral-900">{toast.title}</h4>
+              <p className="text-xs text-neutral-600 mt-0.5 leading-relaxed">{toast.message}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setToast(null)}
+              className="text-neutral-400 hover:text-neutral-600 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Top Application Bar with Navigation */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-xs">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onReturnToDashboard}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to Profile</span>
+            </button>
+            <div className="h-5 w-px bg-neutral-200 hidden sm:block" />
+            <div className="hidden sm:flex items-center gap-2">
+              <span className="font-bold text-sm text-neutral-900">{profile.name}</span>
+              <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-200 flex items-center gap-1">
+                <Check className="w-3 h-3 text-emerald-600" />
+                Udyam Verified
+              </span>
+            </div>
+          </div>
 
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#00875A] flex items-center justify-center text-white shadow-xs">
-              <Scale className="w-4 h-4 stroke-[2.2]" />
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-800 text-xs font-bold border border-blue-200">
+              <Award className="w-3.5 h-3.5 text-blue-600" />
+              <span>ZED Silver</span>
             </div>
-            <span className="text-xl font-bold tracking-tight text-[#191C1E]">
-              CERCI Compliance Engine
-            </span>
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[#E8F5E9] text-[#1B5E20] border border-[#C8E6C9] hidden sm:inline">
-              CPCB / SPCB 2026 Aligned
-            </span>
+            <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Score: {complianceHealthPercent}%</span>
+            </div>
           </div>
+        </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-neutral-500 hidden md:block">
-              {profile.name}
-            </span>
-            <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-neutral-100 text-neutral-700 border border-neutral-200">
-              {profile.role}
-            </span>
-          </div>
+        {/* Dedicated Navigation Bar / Section Switcher (Organized, Not Bombarding) */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-neutral-100 overflow-x-auto no-scrollbar py-2.5 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab('overview')}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'overview'
+                ? 'bg-[#191C1E] text-white shadow-xs'
+                : 'bg-white text-neutral-600 hover:text-neutral-900 border border-neutral-200 hover:bg-neutral-50'
+            }`}
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+            <span>Overview & Pulse</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('engine')}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'engine'
+                ? 'bg-[#191C1E] text-white shadow-xs'
+                : 'bg-white text-neutral-600 hover:text-neutral-900 border border-neutral-200 hover:bg-neutral-50'
+            }`}
+          >
+            <Clock className="w-3.5 h-3.5 text-rose-500" />
+            <span>Statutory Compliance Engine</span>
+            {urgentCount > 0 && (
+              <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('zed')}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'zed'
+                ? 'bg-[#191C1E] text-white shadow-xs'
+                : 'bg-white text-neutral-600 hover:text-neutral-900 border border-neutral-200 hover:bg-neutral-50'
+            }`}
+          >
+            <Award className="w-3.5 h-3.5 text-blue-600" />
+            <span>ZED Certification Desk</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('capital')}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'capital'
+                ? 'bg-[#191C1E] text-white shadow-xs'
+                : 'bg-white text-neutral-600 hover:text-neutral-900 border border-neutral-200 hover:bg-neutral-50'
+            }`}
+          >
+            <Calculator className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Green Capital Simulator</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('subsidies')}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'subsidies'
+                ? 'bg-[#191C1E] text-white shadow-xs'
+                : 'bg-white text-neutral-600 hover:text-neutral-900 border border-neutral-200 hover:bg-neutral-50'
+            }`}
+          >
+            <DollarSign className="w-3.5 h-3.5 text-amber-600" />
+            <span>Govt Schemes & Subsidies</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('checklist')}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'checklist'
+                ? 'bg-[#191C1E] text-white shadow-xs'
+                : 'bg-white text-neutral-600 hover:text-neutral-900 border border-neutral-200 hover:bg-neutral-50'
+            }`}
+          >
+            <FileText className="w-3.5 h-3.5 text-teal-600" />
+            <span>Assessment & Hacks ({totalPoints} Pts)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('dossier')}
+            className={`px-4 py-2 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'dossier'
+                ? 'bg-[#191C1E] text-white shadow-xs'
+                : 'bg-white text-neutral-600 hover:text-neutral-900 border border-neutral-200 hover:bg-neutral-50'
+            }`}
+          >
+            <QrCode className="w-3.5 h-3.5 text-neutral-700" />
+            <span>Compliance Dossier</span>
+          </button>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 w-full space-y-8">
-        {/* EXECUTIVE HERO SCORECARD (Mathematical Scoring System) */}
-        <div className="bg-white rounded-3xl border border-neutral-200/90 shadow-sm p-6 sm:p-8 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#1B5E20] via-[#10B981] to-[#0284C7]" />
-
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-neutral-100">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold mb-3 border border-emerald-200">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Statutory Environmental & Operational Compliance Index</span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191C1E]">
-                {profile.name} Compliance Score
-              </h1>
-              <p className="mt-2 text-sm text-neutral-600 max-w-2xl leading-relaxed">
-                A rigorous, mathematically weighted assessment measuring adherence to CPCB/SPCB hazardous scrap guidelines, digital DRP traceability, and energy benchmarks. Compliance is transformed into measurable operational savings.
-              </p>
-            </div>
-
-            {/* Live Score Dial Display */}
-            <div className="flex items-center gap-5 p-4 sm:p-5 rounded-2xl bg-neutral-50/90 border border-neutral-200/80 flex-shrink-0">
-              <div className="text-center">
-                <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-4xl sm:text-5xl font-black text-[#1B5E20] tracking-tight">
-                    {currentScore}
-                  </span>
-                  <span className="text-lg font-bold text-neutral-400">
-                    / 100
-                  </span>
-                </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block mt-0.5">
-                  Mathematical Index
-                </span>
-              </div>
-
-              <div className="border-l border-neutral-200 pl-4 space-y-1">
-                <span className={`inline-block text-xs font-extrabold px-2.5 py-0.5 rounded-full border ${currentTier.color}`}>
-                  {currentTier.tier}
-                </span>
-                <p className="text-[11px] text-neutral-500">
-                  Cluster Percentile: <strong className="text-neutral-800">Top 12%</strong>
-                </p>
-                <p className="text-[11px] text-emerald-700 font-semibold">
-                  Est. Annual Benefit: +₹2,48,000/yr
+      {/* Main Content Area */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 w-full flex-grow">
+        {/* ======================================================== */}
+        {/* VIEW 1: OVERVIEW & ENTERPRISE PULSE                      */}
+        {/* ======================================================== */}
+        {activeTab === 'overview' && (
+          <div className="space-y-7 animate-fade-in">
+            {/* Header Title & Subtitle */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#191C1E]">
+                  Overview
+                </h1>
+                <p className="text-sm sm:text-base text-neutral-500">
+                  Welcome back. Here is your enterprise compliance snapshot and green transmission standing.
                 </p>
               </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('dossier')}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold text-neutral-700 bg-white border border-neutral-200 hover:bg-neutral-50 cursor-pointer shadow-xs"
+                >
+                  <Printer className="w-3.5 h-3.5 text-neutral-500" />
+                  <span>Download Green Dossier</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Category Progress Bars */}
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {Object.entries(categoryBreakdown).map(([key, cat]) => {
-              const catPercent = Math.round((cat.current / cat.total) * 100);
-              return (
-                <div key={key} className="p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100 space-y-1.5">
-                  <div className="flex justify-between text-[11px] font-bold text-neutral-700">
-                    <span className="truncate pr-1">{cat.label}</span>
-                    <span className="text-[#166534]">{cat.current}/{cat.total} pts</span>
-                  </div>
-                  <div className="w-full h-2 rounded-full bg-neutral-200 overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-emerald-500 to-[#10B981] rounded-full transition-all duration-300"
-                      style={{ width: `${catPercent}%` }}
-                    />
-                  </div>
-                  <span className="text-[10px] text-neutral-400 block">
-                    {catPercent}% Achieved
+            {/* THE 3 EXACT CARDS FROM REFERENCE IMAGES */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {/* CARD 1: Compliance Health */}
+              <div className="bg-white rounded-3xl p-6 sm:p-7 border border-neutral-200/90 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
+                <div className="flex items-start justify-between">
+                  <span className="text-sm font-semibold text-neutral-600">
+                    Compliance Health
                   </span>
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 border border-emerald-100">
+                    <ShieldCheck className="w-5 h-5 stroke-[2.2]" />
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
 
-        {/* 4 CORE NAVIGATION TABS */}
-        <div className="border-b border-neutral-200">
-          <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
-            <button
-              type="button"
-              onClick={() => setActiveTab('assessment')}
-              className={`pb-3.5 px-3 text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
-                activeTab === 'assessment'
-                  ? 'border-[#00875A] text-[#00875A]'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-900'
-              }`}
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>{t.compliance.tabAssessment} ({checklist.filter(c => c.checked).length}/{checklist.length})</span>
-            </button>
+                <div className="space-y-2">
+                  <div className="text-4xl sm:text-5xl font-black text-neutral-900 tracking-tight">
+                    {complianceHealthPercent}%
+                  </div>
 
-            <button
-              type="button"
-              onClick={() => setActiveTab('regulations')}
-              className={`pb-3.5 px-3 text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
-                activeTab === 'regulations'
-                  ? 'border-[#00875A] text-[#00875A]'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-900'
-              }`}
-            >
-              <Bell className="w-4 h-4" />
-              <span>{t.compliance.tabRegulations} ({regulationsFeed.length})</span>
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            </button>
+                  <div className="flex items-center gap-2">
+                    {urgentCount > 0 ? (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        <span>{urgentCount} Action Needed</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <Check className="w-3.5 h-3.5" />
+                        <span>All Clear • Audit Proof</span>
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-            <button
-              type="button"
-              onClick={() => setActiveTab('implementation')}
-              className={`pb-3.5 px-3 text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
-                activeTab === 'implementation'
-                  ? 'border-[#00875A] text-[#00875A]'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-900'
-              }`}
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>{t.compliance.tabImplementation}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('low-cost-hacks')}
-              className={`pb-3.5 px-3 text-sm font-bold flex items-center gap-2 border-b-2 whitespace-nowrap transition-colors cursor-pointer ${
-                activeTab === 'low-cost-hacks'
-                  ? 'border-[#00875A] text-[#00875A]'
-                  : 'border-transparent text-neutral-500 hover:text-neutral-900'
-              }`}
-            >
-              <DollarSign className="w-4 h-4" />
-              <span>{t.compliance.tabLowCostHacks}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* ======================================================== */}
-        {/* TAB 1: INTERACTIVE SELF-ASSESSMENT CHECKLIST            */}
-        {/* ======================================================== */}
-        {activeTab === 'assessment' && (
-          <div className="space-y-6 animate-fade-in">
-            {/* Category Filter Pills */}
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
-                {(['ALL', 'hazardous', 'epr', 'air_water', 'energy', 'safety'] as const).map((cat) => (
+                <div className="pt-2">
                   <button
-                    key={cat}
                     type="button"
-                    onClick={() => setSelectedCategoryFilter(cat)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                      selectedCategoryFilter === cat
-                        ? 'bg-[#191C1E] text-white shadow-xs'
-                        : 'bg-white text-neutral-600 hover:text-neutral-900 border border-neutral-200'
+                    onClick={() => setActiveTab('engine')}
+                    className="w-full py-2.5 rounded-full text-xs font-bold text-neutral-800 bg-neutral-100 hover:bg-neutral-200 transition-colors cursor-pointer text-center"
+                  >
+                    Review {urgentCount} Alerts
+                  </button>
+                </div>
+              </div>
+
+              {/* CARD 2: Active Subsidies */}
+              <div className="bg-white rounded-3xl p-6 sm:p-7 border border-neutral-200/90 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between space-y-4">
+                <div className="flex items-start justify-between">
+                  <span className="text-sm font-semibold text-neutral-600">
+                    Active Subsidies
+                  </span>
+                  <div className="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0 border border-sky-100">
+                    <span className="text-lg font-black font-sans">₹</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-4xl sm:text-5xl font-black text-neutral-900 tracking-tight">
+                    ₹12.4L
+                  </div>
+
+                  <div className="flex items-center gap-2 text-xs text-neutral-600">
+                    <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
+                    <span>Disbursal in progress (SIDBI STAR)</span>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('subsidies')}
+                    className="w-full py-2.5 rounded-full text-xs font-bold text-white bg-sky-700 hover:bg-sky-800 transition-colors cursor-pointer text-center shadow-xs"
+                  >
+                    Claim Funds
+                  </button>
+                </div>
+              </div>
+
+              {/* CARD 3: ZED Status (Royal Blue Card) */}
+              <div className="bg-gradient-to-br from-[#1E40AF] via-[#1D4ED8] to-[#2563EB] text-white rounded-3xl p-6 sm:p-7 shadow-md flex flex-col justify-between space-y-4 relative overflow-hidden">
+                <div className="flex items-start justify-between">
+                  <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center flex-shrink-0">
+                    <Award className="w-5 h-5 stroke-[2.2]" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/20 text-white backdrop-blur-md">
+                    VERIFIED
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-xs text-blue-100 font-medium block">
+                    ZED Certification Rating
+                  </span>
+                  <div className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                    Silver Tier
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-emerald-300 font-medium pt-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                    <span>Valid until Oct 2029 (14 Params)</span>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('zed')}
+                    className="w-full py-2.5 rounded-full text-xs font-extrabold text-neutral-900 bg-white hover:bg-neutral-100 active:scale-[0.98] transition-all cursor-pointer text-center shadow-md"
+                  >
+                    Upgrade to Gold
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Score Calculation Factor Breakdown */}
+            <div className="bg-white rounded-3xl border border-neutral-200/90 p-6 sm:p-7 shadow-xs space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-neutral-100">
+                <div>
+                  <h3 className="text-lg font-bold text-neutral-900">
+                    How Your Compliance Score is Calculated
+                  </h3>
+                  <p className="text-xs text-neutral-500">
+                    Weighted across 4 statutory dimensions mandated by CPCB, State PCB, and Ministry of MSME.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                    Total Earned: {totalPoints} / {maxPoints} Points
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-neutral-800">1. Statutory Returns</span>
+                    <span className="font-mono text-emerald-700 font-bold">25 Pts</span>
+                  </div>
+                  <div className="w-full bg-neutral-200 h-2 rounded-full overflow-hidden">
+                    <div className="bg-emerald-600 h-full rounded-full" style={{ width: '90%' }} />
+                  </div>
+                  <p className="text-[11px] text-neutral-500">
+                    GSTN scrap declarations, EPFO e-returns, and annual factory renewals.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-neutral-800">2. CPCB & DRP Manifests</span>
+                    <span className="font-mono text-emerald-700 font-bold">25 Pts</span>
+                  </div>
+                  <div className="w-full bg-neutral-200 h-2 rounded-full overflow-hidden">
+                    <div className="bg-emerald-600 h-full rounded-full" style={{ width: '95%' }} />
+                  </div>
+                  <p className="text-[11px] text-neutral-500">
+                    Digital Form-10 manifests, chain-of-custody, and EPR recycled feedstock quotas.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-neutral-800">3. Environmental Consents</span>
+                    <span className="font-mono text-emerald-700 font-bold">20 Pts</span>
+                  </div>
+                  <div className="w-full bg-neutral-200 h-2 rounded-full overflow-hidden">
+                    <div className="bg-emerald-600 h-full rounded-full" style={{ width: '85%' }} />
+                  </div>
+                  <p className="text-[11px] text-neutral-500">
+                    Air & Water CTO status, oil-water separators, and NABL spectrographic testing.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-neutral-800">4. Energy & ZED Norms</span>
+                    <span className="font-mono text-emerald-700 font-bold">18 Pts</span>
+                  </div>
+                  <div className="w-full bg-neutral-200 h-2 rounded-full overflow-hidden">
+                    <div className="bg-emerald-600 h-full rounded-full" style={{ width: '80%' }} />
+                  </div>
+                  <p className="text-[11px] text-neutral-500">
+                    APFC power factor correction, VFDs, worker PPE, and swarf oil centrifugal recovery.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick-Access Interactive Hub Grid */}
+            <div className="pt-2">
+              <div className="mb-4">
+                <h3 className="text-lg font-bold text-neutral-900">
+                  Green Transmission & Statutory Hub
+                </h3>
+                <p className="text-xs text-neutral-500">
+                  Select a dedicated center to explore and fulfill Indian MSME programs.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                {/* Hub 1: Statutory Engine */}
+                <div
+                  onClick={() => setActiveTab('engine')}
+                  className="p-5 rounded-2xl bg-white border border-neutral-200 hover:border-neutral-400 hover:shadow-xs transition-all cursor-pointer space-y-2 group"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <h4 className="font-bold text-neutral-900 text-sm group-hover:text-rose-700 transition-colors">
+                    Compliance Engine
+                  </h4>
+                  <p className="text-neutral-500 text-[11px] leading-relaxed">
+                    Track GSTR-3B, EPFO, and CPCB Form-10 manifests with 1-click filing.
+                  </p>
+                </div>
+
+                {/* Hub 2: Green Capital Simulator */}
+                <div
+                  onClick={() => setActiveTab('capital')}
+                  className="p-5 rounded-2xl bg-white border border-neutral-200 hover:border-neutral-400 hover:shadow-xs transition-all cursor-pointer space-y-2 group"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                    <Calculator className="w-4 h-4" />
+                  </div>
+                  <h4 className="font-bold text-neutral-900 text-sm group-hover:text-emerald-700 transition-colors">
+                    Green Capital Simulator
+                  </h4>
+                  <p className="text-neutral-500 text-[11px] leading-relaxed">
+                    Calculate monthly EMIs for rooftop solar and ETPs at 7.5% subsidized rate.
+                  </p>
+                </div>
+
+                {/* Hub 3: Govt Subsidies */}
+                <div
+                  onClick={() => setActiveTab('subsidies')}
+                  className="p-5 rounded-2xl bg-white border border-neutral-200 hover:border-neutral-400 hover:shadow-xs transition-all cursor-pointer space-y-2 group"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center">
+                    <Sun className="w-4 h-4" />
+                  </div>
+                  <h4 className="font-bold text-neutral-900 text-sm group-hover:text-amber-700 transition-colors">
+                    SIDBI STAR & PMEGP
+                  </h4>
+                  <p className="text-neutral-500 text-[11px] leading-relaxed">
+                    Direct 2% interest subvention and up to 25% capital grants for MSMEs.
+                  </p>
+                </div>
+
+                {/* Hub 4: ZED Gold Upgrade */}
+                <div
+                  onClick={() => setActiveTab('zed')}
+                  className="p-5 rounded-2xl bg-white border border-neutral-200 hover:border-neutral-400 hover:shadow-xs transition-all cursor-pointer space-y-2 group"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
+                    <Award className="w-4 h-4" />
+                  </div>
+                  <h4 className="font-bold text-neutral-900 text-sm group-hover:text-blue-700 transition-colors">
+                    ZED Silver to Gold
+                  </h4>
+                  <p className="text-neutral-500 text-[11px] leading-relaxed">
+                    Avail Govt ₹5 Lakhs consulting subsidy and 0.5% bank loan rebate.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* VIEW 2: COMPLIANCE ENGINE (Screenshots 2, 3, 8)           */}
+        {/* ======================================================== */}
+        {activeTab === 'engine' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#191C1E]">
+                  Statutory Compliance Engine
+                </h1>
+                <p className="text-sm sm:text-base text-neutral-500">
+                  Unified statutory tracking. APIs sync directly with MCA, GSTN, EPFO, and CPCB portals.
+                </p>
+              </div>
+
+              {/* Filter Pills */}
+              <div className="flex items-center gap-1.5 p-1 bg-white border border-neutral-200 rounded-full text-xs">
+                {(['all', 'urgent', 'pending', 'complied'] as const).map((filter) => (
+                  <button
+                    key={filter}
+                    type="button"
+                    onClick={() => setEngineFilter(filter)}
+                    className={`px-3 py-1 rounded-full font-bold capitalize transition-all cursor-pointer ${
+                      engineFilter === filter
+                        ? 'bg-neutral-900 text-white'
+                        : 'text-neutral-600 hover:text-neutral-900'
                     }`}
                   >
-                    {cat === 'ALL'
-                      ? t.compliance.filterAll
-                      : cat === 'hazardous'
-                      ? `${t.compliance.filterHazardous} (25p)`
-                      : cat === 'epr'
-                      ? `${t.compliance.filterEpr} (25p)`
-                      : cat === 'air_water'
-                      ? `${t.compliance.filterAirWater} (20p)`
-                      : cat === 'energy'
-                      ? `${t.compliance.filterEnergy} (15p)`
-                      : `${t.compliance.filterSafety} (15p)`}
+                    {filter}
                   </button>
                 ))}
               </div>
+            </div>
 
-              <span className="text-xs text-neutral-500">
-                Check off items your factory implements to recompute your score live.
-              </span>
+            {/* Table / Card Container matching Screenshot 2, 3, 8 */}
+            <div className="bg-white rounded-3xl border border-neutral-200/90 shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-neutral-100 text-neutral-400 font-bold uppercase tracking-wider text-[11px] bg-neutral-50/50">
+                      <th className="py-4 px-6">AUTHORITY</th>
+                      <th className="py-4 px-6">FILING / TASK DESCRIPTION</th>
+                      <th className="py-4 px-6">DEADLINE</th>
+                      <th className="py-4 px-6">STATUS</th>
+                      <th className="py-4 px-6 text-right">ACTION</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-100 text-neutral-800">
+                    {filteredTasks.map((task) => (
+                      <tr key={task.id} className="hover:bg-neutral-50/80 transition-colors">
+                        {/* AUTHORITY Column */}
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs ${task.authorityColor}`}>
+                              {task.authorityIcon === 'gstn' && <Calculator className="w-4 h-4" />}
+                              {task.authorityIcon === 'epfo' && <Users className="w-4 h-4" />}
+                              {task.authorityIcon === 'state' && <Factory className="w-4 h-4" />}
+                              {task.authorityIcon === 'cpcb' && <Leaf className="w-4 h-4" />}
+                              {task.authorityIcon === 'spcb' && <Scale className="w-4 h-4" />}
+                              {task.authorityIcon === 'fire' && <Flame className="w-4 h-4" />}
+                            </div>
+                            <div>
+                              <span className="font-bold text-neutral-900 text-sm block">
+                                {task.authority}
+                              </span>
+                              <span className="text-[10px] text-neutral-400 font-medium">
+                                {task.filingType}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* FILING DESCRIPTION Column */}
+                        <td className="py-4 px-6">
+                          <div className="max-w-md">
+                            <span className="font-bold text-neutral-900 text-sm block">
+                              {task.taskTitle}
+                            </span>
+                            <span className="text-neutral-500 text-[11px] mt-0.5 line-clamp-1">
+                              {task.taskDescription}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* DEADLINE Column */}
+                        <td className="py-4 px-6 font-semibold">
+                          <span
+                            className={
+                              task.status === 'Complied'
+                                ? 'line-through text-neutral-400'
+                                : task.isUrgent
+                                ? 'text-rose-600 font-black'
+                                : 'text-neutral-700'
+                            }
+                          >
+                            {task.deadline}
+                          </span>
+                        </td>
+
+                        {/* STATUS Column */}
+                        <td className="py-4 px-6">
+                          <span
+                            className={`px-3 py-1 rounded-full text-[11px] font-bold inline-block ${
+                              task.status === 'Urgent'
+                                ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                : task.status === 'Pending'
+                                ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                                : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            }`}
+                          >
+                            {task.status}
+                          </span>
+                        </td>
+
+                        {/* ACTION Column matching exact screenshot buttons */}
+                        <td className="py-4 px-6 text-right">
+                          {task.status === 'Urgent' ? (
+                            <button
+                              type="button"
+                              onClick={() => handle1ClickFile(task.id)}
+                              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#191C1E] hover:bg-neutral-800 active:scale-[0.98] transition-all cursor-pointer shadow-xs whitespace-nowrap"
+                            >
+                              1-Click File
+                            </button>
+                          ) : task.status === 'Pending' ? (
+                            <button
+                              type="button"
+                              onClick={() => handle1ClickFile(task.id)}
+                              className="px-4 py-2 rounded-xl text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer whitespace-nowrap"
+                            >
+                              Prepare Draft
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedReceipt(task.receiptNumber || 'REC-2026-OK')}
+                              className="text-xs font-bold text-neutral-600 hover:text-neutral-900 hover:underline cursor-pointer whitespace-nowrap"
+                            >
+                              View Receipt
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="p-4 bg-neutral-50 border-t border-neutral-100 text-xs text-neutral-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <span>Encrypted API gateway connected to GSTN / MCA 21 / Parivesh SPCB portal.</span>
+                <span className="font-mono text-[11px] text-emerald-700 font-semibold flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Sync Active
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* VIEW 3: ZED CERTIFICATION HUB (Screenshots 7, 10, 13)    */}
+        {/* ======================================================== */}
+        {activeTab === 'zed' && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Government MSME ZED Banner matching Screenshot 13 */}
+            <div className="bg-white rounded-3xl border border-neutral-200/90 p-6 sm:p-8 shadow-xs space-y-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-neutral-100">
+                <div className="space-y-2 max-w-2xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
+                    <Award className="w-3.5 h-3.5" />
+                    <span>Ministry of MSME • Govt of India Initiative</span>
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191C1E]">
+                    MSME Sustainable (ZED) Certification
+                  </h1>
+                  <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
+                    MSME Sustainable (ZED) Certification is an extensive national drive to create awareness amongst Indian MSMEs about Zero Defect Zero Effect practices and motivate and incentivise them for ZED Certification while also encouraging them to become MSME Champions.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setZedUpgradeModalOpen(true)}
+                    className="px-6 py-3 rounded-2xl text-xs sm:text-sm font-bold text-white bg-[#00875A] hover:bg-[#065F46] transition-all shadow-md cursor-pointer text-center"
+                  >
+                    UPGRADE TO GOLD
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setZedInfoModalOpen(true)}
+                    className="px-6 py-3 rounded-2xl text-xs sm:text-sm font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 transition-colors cursor-pointer text-center"
+                  >
+                    SCHEME GUIDELINES
+                  </button>
+                </div>
+              </div>
+
+              {/* Official Subsidy Highlights */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-200 text-xs space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-blue-900 block">
+                    Micro Enterprises
+                  </span>
+                  <div className="text-2xl font-black text-blue-950">80% Subsidy</div>
+                  <p className="text-neutral-600 text-[11px]">
+                    On certification fees, audits, and clean equipment testing.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 text-xs space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-emerald-900 block">
+                    Small Enterprises
+                  </span>
+                  <div className="text-2xl font-black text-emerald-950">60% Subsidy</div>
+                  <p className="text-neutral-600 text-[11px]">
+                    Direct reimbursement on Quality Council of India audits.
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-purple-50/60 border border-purple-200 text-xs space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-purple-900 block">
+                    Medium Enterprises
+                  </span>
+                  <div className="text-2xl font-black text-purple-950">50% Subsidy</div>
+                  <p className="text-neutral-600 text-[11px]">
+                    Plus additional 10% for Women / SC / ST / NER units.
+                  </p>
+                </div>
+              </div>
+
+              {/* 3 Certification Levels & Progression */}
+              <div className="space-y-3 pt-2">
+                <h4 className="font-bold text-sm text-neutral-900">
+                  Certification Levels & Enterprise Pathway
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Bronze */}
+                  <div className="p-5 rounded-2xl border border-neutral-200 bg-neutral-50/60 space-y-2 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-neutral-900 text-sm">Bronze Level</span>
+                      <span className="text-[10px] font-bold text-neutral-500">5 Parameters</span>
+                    </div>
+                    <p className="text-neutral-500 text-[11px]">
+                      Basic shop floor cleanliness, energy conservation, worker safety gear, and daily scrap logging.
+                    </p>
+                    <span className="text-emerald-700 font-bold text-[11px] block">✓ Completed & Cleared</span>
+                  </div>
+
+                  {/* Silver (Current) */}
+                  <div className="p-5 rounded-2xl border-2 border-blue-600 bg-blue-50/30 space-y-2 text-xs relative">
+                    <span className="absolute -top-2.5 right-4 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      CURRENT STATUS
+                    </span>
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-blue-950 text-sm">Silver Level</span>
+                      <span className="text-[10px] font-bold text-blue-800">14 Parameters</span>
+                    </div>
+                    <p className="text-neutral-600 text-[11px]">
+                      NABL assay testing, segregated scrap bins, DRP traceability, and APFC power factor correction.
+                    </p>
+                    <span className="text-blue-700 font-bold text-[11px] block">Active Valid until Oct 2029</span>
+                  </div>
+
+                  {/* Gold (Next Target) */}
+                  <div className="p-5 rounded-2xl border border-amber-300 bg-amber-50/30 space-y-2 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-amber-950 text-sm">Gold Level (Target)</span>
+                      <span className="text-[10px] font-bold text-amber-800">20 Parameters</span>
+                    </div>
+                    <p className="text-neutral-600 text-[11px]">
+                      Zero Liquid Discharge, solar energy integration, complete circular supply chain verification.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setZedUpgradeModalOpen(true)}
+                      className="w-full mt-2 py-2 rounded-xl text-xs font-bold text-amber-950 bg-amber-200 hover:bg-amber-300 transition-colors cursor-pointer text-center"
+                    >
+                      Apply for Gold Upgrade →
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Benefits of ZED Certification in India */}
+              <div className="p-5 rounded-2xl bg-neutral-50 border border-neutral-200 text-xs space-y-2.5">
+                <span className="font-bold text-neutral-800 text-sm block">
+                  Commercial & Financial Incentives for ZED Certified MSMEs:
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-neutral-600">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>0.5% Concession on Bank Interest Rates:</strong> Available across SBI, Canara, PNB, and Bank of Baroda.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>₹5,00,000 Handholding Consulting Grant:</strong> Complete financial support by Quality Council of India.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>GeM Portal Priority:</strong> Fast-track allocation in government procurement contracts and tenders.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Green Channel SPCB Exemption:</strong> Waiver of routine third-party factory inspection visits.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* VIEW 4: GREEN CAPITAL SIMULATOR (Screenshot 5)           */}
+        {/* ======================================================== */}
+        {activeTab === 'capital' && (
+          <div className="space-y-6 animate-fade-in max-w-2xl mx-auto">
+            {/* Header matching Screenshot 5 */}
+            <div className="space-y-1">
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#191C1E]">
+                Green Capital
+              </h1>
+              <p className="text-sm sm:text-base text-neutral-500">
+                Simulate investments for solar or ETPs and discover matched subsidized schemes.
+              </p>
+            </div>
+
+            {/* Purpose Selector */}
+            <div className="flex flex-wrap gap-2">
+              {[
+                { id: 'solar', label: 'Rooftop Solar PV' },
+                { id: 'etp', label: 'Effluent Treatment Plant (ETP/ZLD)' },
+                { id: 'furnace', label: 'Clean Electric Furnace' },
+                { id: 'machinery', label: 'High-Efficiency VFD Machinery' },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setCapitalPurpose(item.id as any)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                    capitalPurpose === item.id
+                      ? 'bg-neutral-900 text-white shadow-xs'
+                      : 'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Simulator Card matching Screenshot 5 */}
+            <div className="bg-white rounded-3xl border border-neutral-200/90 p-6 sm:p-8 shadow-xs space-y-7">
+              {/* Slider 1: Required Capital Amount */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-neutral-800">
+                    Required Capital Amount
+                  </span>
+                  <span className="px-3.5 py-1 rounded-2xl bg-sky-100/70 text-sky-800 text-sm font-extrabold">
+                    ₹{capitalAmountLakhs} L
+                  </span>
+                </div>
+
+                <input
+                  type="range"
+                  min={5}
+                  max={500}
+                  step={5}
+                  value={capitalAmountLakhs}
+                  onChange={(e) => setCapitalAmountLakhs(Number(e.target.value))}
+                  className="w-full h-2.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-sky-600"
+                />
+
+                <div className="flex justify-between text-[11px] font-bold text-neutral-400 tracking-wider">
+                  <span>₹5 LAKHS</span>
+                  <span>₹5 CRORES</span>
+                </div>
+              </div>
+
+              {/* Slider 2: Repayment Tenure */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-neutral-800">
+                    Repayment Tenure
+                  </span>
+                  <span className="px-3.5 py-1 rounded-2xl bg-sky-100/70 text-sky-800 text-sm font-extrabold">
+                    {repaymentTenureYears} Yrs
+                  </span>
+                </div>
+
+                <input
+                  type="range"
+                  min={1}
+                  max={10}
+                  step={1}
+                  value={repaymentTenureYears}
+                  onChange={(e) => setRepaymentTenureYears(Number(e.target.value))}
+                  className="w-full h-2.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-sky-600"
+                />
+
+                <div className="flex justify-between text-[11px] font-bold text-neutral-400 tracking-wider">
+                  <span>1 YEAR</span>
+                  <span>10 YEARS</span>
+                </div>
+              </div>
+
+              {/* Calculation Result Card matching Screenshot 5 */}
+              <div className="bg-neutral-50/80 rounded-3xl p-6 border border-neutral-200/80 text-center space-y-3">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 block">
+                  EST. MONTHLY EMI
+                </span>
+
+                <div className="text-3xl sm:text-4xl font-black text-neutral-900 tracking-tight">
+                  ₹{calculationResults.monthlyEMI.toLocaleString('en-IN')}
+                </div>
+
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200">
+                  <span>7.5% Subsidized Rate Applied</span>
+                </div>
+
+                {/* Savings compared to commercial bank */}
+                <div className="p-3.5 rounded-2xl bg-white border border-neutral-200/80 text-xs text-neutral-700 space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Commercial Benchmark EMI (11.2%):</span>
+                    <span className="line-through text-neutral-400">₹{calculationResults.commercialEMI.toLocaleString('en-IN')}/mo</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-emerald-700">
+                    <span>Total Interest Saved via Subsidies:</span>
+                    <span>₹{(calculationResults.totalInterestSaved / 100000).toFixed(2)} Lakhs</span>
+                  </div>
+                </div>
+
+                <p className="text-xs text-neutral-500 max-w-sm mx-auto pt-1 leading-relaxed">
+                  Includes 2% interest subvention through SIDBI STAR Scheme and CGTMSE sovereign collateral waiver.
+                </p>
+
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const scheme = govtSchemes[0];
+                      handleApplyScheme(scheme);
+                    }}
+                    className="px-6 py-3 rounded-full text-xs sm:text-sm font-bold text-white bg-[#00875A] hover:bg-[#065F46] transition-colors cursor-pointer shadow-xs"
+                  >
+                    Apply for this Subsidized Green Line →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* VIEW 5: GOVT SUBSIDIES & SCHEMES (Screenshots 4 & 9)      */}
+        {/* ======================================================== */}
+        {activeTab === 'subsidies' && (
+          <div className="space-y-6 animate-fade-in max-w-3xl mx-auto">
+            <div className="space-y-1">
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#191C1E]">
+                Government Subsidies & Schemes
+              </h1>
+              <p className="text-sm sm:text-base text-neutral-500">
+                Direct financing lines, interest subventions, and capital grants for green transition in Indian MSMEs.
+              </p>
+            </div>
+
+            <div className="space-y-5">
+              {filteredSchemes.map((scheme, idx) => (
+                <div
+                  key={scheme.id}
+                  className="bg-white rounded-3xl border border-neutral-200/90 p-6 sm:p-7 shadow-xs space-y-4 relative hover:shadow-md transition-shadow"
+                >
+                  <span className={`absolute top-6 right-6 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${scheme.badgeColor}`}>
+                    {scheme.badge}
+                  </span>
+
+                  <div className="w-12 h-12 rounded-2xl bg-neutral-100 flex items-center justify-center">
+                    {scheme.category === 'solar' && <Sun className="w-6 h-6 text-amber-600 stroke-[2.2]" />}
+                    {scheme.category === 'efficiency' && <Zap className="w-6 h-6 text-emerald-600 stroke-[2.2]" />}
+                    {scheme.category === 'credit' && <ShieldCheck className="w-6 h-6 text-blue-600 stroke-[2.2]" />}
+                    {scheme.category === 'grant' && <DollarSign className="w-6 h-6 text-purple-600 stroke-[2.2]" />}
+                  </div>
+
+                  <div className="space-y-1.5 pr-24">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 block">
+                      {scheme.agency}
+                    </span>
+                    <h3 className="text-xl font-bold text-neutral-900">
+                      {scheme.name}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
+                      {scheme.headline}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
+                    <div className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-100">
+                      <span className="text-[10px] font-bold text-neutral-400 uppercase block">Incentive</span>
+                      <strong className="text-emerald-700 text-[11px]">{scheme.subsidyRate}</strong>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-100">
+                      <span className="text-[10px] font-bold text-neutral-400 uppercase block">Interest Rate</span>
+                      <strong className="text-neutral-800 text-[11px]">{scheme.concessionalRate}</strong>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-100">
+                      <span className="text-[10px] font-bold text-neutral-400 uppercase block">Outlay</span>
+                      <strong className="text-neutral-800 text-[11px]">{scheme.maxAmount}</strong>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-100">
+                      <span className="text-[10px] font-bold text-neutral-400 uppercase block">Collateral</span>
+                      <strong className="text-blue-700 text-[11px]">{scheme.collateral}</strong>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-t border-neutral-100">
+                    <button
+                      type="button"
+                      onClick={() => setSchemeDetailModal(scheme)}
+                      className="text-xs font-bold text-neutral-500 hover:text-neutral-900 cursor-pointer text-left"
+                    >
+                      View Scheme Guidelines & Eligibility →
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleApplyScheme(scheme)}
+                      className="px-5 py-2.5 rounded-full text-xs font-bold text-white bg-[#191C1E] hover:bg-neutral-800 transition-colors cursor-pointer text-center shadow-xs"
+                    >
+                      Apply via LoopGrid Desk →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* VIEW 6: ASSESSMENT CHECKLIST & HACKS                     */}
+        {/* ======================================================== */}
+        {activeTab === 'checklist' && (
+          <div className="space-y-6 animate-fade-in">
+            {/* Scorecard Header */}
+            <div className="bg-white rounded-3xl border border-neutral-200/90 p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  CPCB & SPCB Statutory Index
+                </span>
+                <h3 className="text-xl font-bold text-neutral-900 mt-1">
+                  Compliance Assessment Checklist & Frugal Hacks
+                </h3>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Fulfill statutory requirements to automatically increase your enterprise compliance health score.
+                </p>
+              </div>
+
+              <div className="text-right">
+                <span className="text-[10px] uppercase font-bold text-neutral-400 block">
+                  Earned Score
+                </span>
+                <div className="text-3xl font-black text-emerald-700">
+                  {totalPoints} / {maxPoints}
+                </div>
+              </div>
+            </div>
+
+            {/* Checklist Category Filter */}
+            <div className="flex flex-wrap gap-2 text-xs">
+              {[
+                { id: 'all', label: 'All Requirements' },
+                { id: 'hazardous', label: 'Hazardous Scrap & Manifests' },
+                { id: 'epr', label: 'EPR & DRP Passports' },
+                { id: 'air_water', label: 'Air & Water Consents' },
+                { id: 'energy', label: 'Energy & APFC' },
+                { id: 'safety', label: 'Worker Safety & OSH' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setChecklistFilter(tab.id as any)}
+                  className={`px-3.5 py-1.5 rounded-full font-semibold transition-all cursor-pointer ${
+                    checklistFilter === tab.id
+                      ? 'bg-neutral-900 text-white shadow-xs'
+                      : 'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
 
             {/* Checklist Items */}
-            <div className="space-y-3.5">
+            <div className="space-y-3">
               {filteredChecklist.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => handleToggleChecklist(item.id)}
-                  className={`rounded-2xl border p-4 sm:p-5 transition-all cursor-pointer select-none ${
+                  onClick={() => toggleChecklistItem(item.id)}
+                  className={`p-5 rounded-2xl border transition-all cursor-pointer flex items-start gap-4 ${
                     item.checked
-                      ? 'bg-white border-[#C8E6C9] shadow-xs'
-                      : 'bg-neutral-50/70 border-neutral-200 hover:border-neutral-300'
+                      ? 'bg-white border-neutral-200/90 shadow-xs'
+                      : 'bg-neutral-50/60 border-neutral-200 opacity-80'
                   }`}
                 >
-                  <div className="flex items-start gap-4">
-                    {/* Checkbox Icon */}
-                    <div
-                      className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors ${
-                        item.checked
-                          ? 'bg-[#166534] text-white shadow-xs'
-                          : 'border-2 border-neutral-300 bg-white'
-                      }`}
-                    >
-                      {item.checked && <Check className="w-4 h-4 stroke-[3]" />}
+                  <div className="mt-1 flex-shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={item.checked}
+                      onChange={() => toggleChecklistItem(item.id)}
+                      className="w-5 h-5 rounded-md accent-[#00875A] cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="flex-grow space-y-1 text-xs">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="font-bold text-neutral-900 text-sm">
+                        {item.title}
+                      </span>
+                      <span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        +{item.points} Points
+                      </span>
                     </div>
 
-                    {/* Content */}
-                    <div className="flex-grow space-y-2">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className={`text-base font-bold ${item.checked ? 'text-neutral-900' : 'text-neutral-700'}`}>
-                            {item.title}
-                          </h3>
-                          <span className="font-mono text-[11px] font-bold text-[#166534] bg-[#E8F5E9] px-2 py-0.5 rounded border border-[#C8E6C9]">
-                            +{item.points} pts
-                          </span>
-                        </div>
-                        <span className="text-[11px] font-mono text-neutral-500">
-                          {item.regulationCode}
-                        </span>
+                    <p className="text-neutral-600 text-xs leading-relaxed">
+                      {item.description}
+                    </p>
+
+                    <div className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-100 mt-2 space-y-1">
+                      <div className="text-[11px] text-neutral-700">
+                        <strong className="text-neutral-900">Efficiency Benefit: </strong>
+                        {item.operationalEfficiencyTip}
                       </div>
-
-                      <p className="text-xs text-neutral-600 leading-relaxed">
-                        {item.description}
-                      </p>
-
-                      {/* Operational Efficiency & Low-Cost Blueprint Badges */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1 text-xs">
-                        <div className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100 flex items-start gap-2">
-                          <TrendingUp className="w-3.5 h-3.5 text-emerald-700 flex-shrink-0 mt-0.5" />
-                          <div>
-                            <span className="font-bold text-emerald-900 text-[11px] block">
-                              Operational Efficiency Benefit:
-                            </span>
-                            <span className="text-neutral-700 text-[11px]">
-                              {item.operationalEfficiencyTip}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="p-2.5 rounded-xl bg-sky-50/70 border border-sky-100 flex items-start gap-2">
-                          <DollarSign className="w-3.5 h-3.5 text-sky-700 flex-shrink-0 mt-0.5" />
-                          <div>
-                            <span className="font-bold text-sky-950 text-[11px] block">
-                              Low-Cost Execution Strategy:
-                            </span>
-                            <span className="text-neutral-700 text-[11px]">
-                              {item.lowCostImplementation}
-                            </span>
-                          </div>
-                        </div>
+                      <div className="text-[11px] text-emerald-800">
+                        <strong className="text-emerald-950">Frugal MSME Hack: </strong>
+                        {item.lowCostImplementation}
                       </div>
+                    </div>
+
+                    <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-neutral-400 border-t border-neutral-100 mt-2 font-mono">
+                      <span>Regulation: {item.regulationCode}</span>
+                      <span className="font-sans font-bold text-neutral-700">
+                        Category: {item.categoryLabel}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -810,259 +1748,462 @@ export const ComplianceScorePage: React.FC<ComplianceScorePageProps> = ({
         )}
 
         {/* ======================================================== */}
-        {/* TAB 2: REAL-TIME GOVERNMENT REGULATIONS & SYNOPSIS      */}
+        {/* VIEW 7: GREEN COMPLIANCE DOSSIER (Certificate View)      */}
         {/* ======================================================== */}
-        {activeTab === 'regulations' && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="p-4 sm:p-5 rounded-2xl bg-[#F0FDF4] border border-[#DCFCE7] flex items-start gap-3">
-              <Bell className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
+        {activeTab === 'dossier' && (
+          <div className="space-y-6 animate-fade-in max-w-3xl mx-auto">
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-sm font-bold text-neutral-900">
-                  Real-Time Central & State Regulatory Intelligence
-                </h3>
-                <p className="text-xs text-neutral-600 mt-0.5">
-                  We monitor the Gazette of India, CPCB circulars, and SPCB notifications 24/7. Rather than dense legal jargon, you receive executive synopses with turnkey implementation roadmaps.
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {regulationsFeed.map((reg) => {
-                const isExpanded = expandedRegulationId === reg.id;
-                return (
-                  <div
-                    key={reg.id}
-                    className="bg-white rounded-2xl border border-neutral-200/90 shadow-xs hover:border-[#10B981] transition-all p-5 sm:p-6 space-y-4"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-neutral-100">
-                      <div className="flex items-center gap-2.5">
-                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${reg.badgeColor}`}>
-                          {reg.ministry}
-                        </span>
-                        <span className="text-xs text-neutral-400 font-mono">
-                          {reg.notificationNumber}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded ${
-                          reg.impactLevel === 'CRITICAL'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}>
-                          Impact: {reg.impactLevel}
-                        </span>
-                        <span className="text-xs text-neutral-400">
-                          {reg.date}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="text-lg font-bold text-[#191C1E]">
-                        {reg.title}
-                      </h4>
-                      <p className="text-xs font-semibold text-emerald-800 mt-0.5">
-                        Enforcement Timeline: {reg.effectiveDate}
-                      </p>
-                    </div>
-
-                    {/* Synopsis Points */}
-                    <div className="space-y-2 p-4 rounded-xl bg-neutral-50 border border-neutral-100 text-xs">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 block">
-                        Detailed Regulatory Synopsis:
-                      </span>
-                      {reg.synopsis.map((syn, sIdx) => (
-                        <div key={sIdx} className="flex items-start gap-2 text-neutral-700">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                          <span>{syn}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Sectors & LoopGrid Implementation Support */}
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 text-xs">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="text-neutral-400 text-[11px]">Sectors Affected:</span>
-                        {reg.sectorsAffected.map((sec, secIdx) => (
-                          <span key={secIdx} className="px-2 py-0.5 rounded bg-neutral-100 text-neutral-700 text-[10px] font-medium">
-                            {sec}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="p-2.5 rounded-xl bg-emerald-50 text-[#166534] border border-emerald-200 text-xs font-medium w-full sm:w-auto">
-                        <strong>LoopGrid Execution:</strong> {reg.loopGridSupport}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* ======================================================== */}
-        {/* TAB 3: STEP-BY-STEP IMPLEMENTATION (TURNKEY SOPS)       */}
-        {/* ======================================================== */}
-        {activeTab === 'implementation' && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="bg-white rounded-3xl border border-neutral-200/90 p-6 sm:p-8 shadow-xs">
-              <div className="max-w-2xl">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#166534] bg-[#E8F5E9] px-2.5 py-0.5 rounded-full border border-[#C8E6C9]">
-                  Frictionless Execution
-                </span>
-                <h3 className="text-xl sm:text-2xl font-bold text-[#191C1E] mt-2">
-                  Transforming Statutory Burden into Shop-Floor Efficiency
-                </h3>
-                <p className="mt-1 text-xs sm:text-sm text-neutral-600 leading-relaxed">
-                  Compliance fails when treated as a quarterly legal panic. LoopGrid embeds compliance directly into day-to-day material movements so standards are achieved automatically as part of production.
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191C1E]">
+                  Enterprise Green Compliance Passport
+                </h1>
+                <p className="text-xs sm:text-sm text-neutral-500">
+                  Official tamper-evident compliance audit record ready for bank underwriting and SPCB submission.
                 </p>
               </div>
 
-              {/* 3 Step Implementation Flow */}
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="p-5 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#166534] text-white flex items-center justify-center font-bold text-sm shadow-xs">
-                    01
-                  </div>
-                  <h4 className="font-bold text-neutral-900 text-base">
-                    Source-Level Swarf Spin & Segregation
-                  </h4>
-                  <p className="text-xs text-neutral-600 leading-relaxed">
-                    Machinists drop CNC chips into categorized color-coded baskets. Neat oil is spun out on-site in 2 minutes, preventing shop-floor puddles and hazardous liquid classification.
-                  </p>
-                  <div className="pt-2 border-t border-neutral-200 text-[11px] font-semibold text-emerald-800">
-                    Result: Zero oil spill notices + 120L reclaimed oil
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#0284C7] text-white flex items-center justify-center font-bold text-sm shadow-xs">
-                    02
-                  </div>
-                  <h4 className="font-bold text-neutral-900 text-base">
-                    One-Tap Digital DRP Generation
-                  </h4>
-                  <p className="text-xs text-neutral-600 leading-relaxed">
-                    When lot reaches pickup weight (500 kg+), the dock supervisor generates a LoopGrid DRP. The platform auto-generates CPCB Form 10, GST e-Way bills, and transit insurance.
-                  </p>
-                  <div className="pt-2 border-t border-neutral-200 text-[11px] font-semibold text-sky-800">
-                    Result: 100% paperless compliance + audit protection
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-neutral-50 border border-neutral-200 space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#7C3AED] text-white flex items-center justify-center font-bold text-sm shadow-xs">
-                    03
-                  </div>
-                  <h4 className="font-bold text-neutral-900 text-base">
-                    Direct Smelter Delivery & Bank Credit
-                  </h4>
-                  <p className="text-xs text-neutral-600 leading-relaxed">
-                    Verified transit carriers transport the lot directly to secondary smelting foundries. Escrow releases automatically to the MSME bank account upon gate spectrometer check.
-                  </p>
-                  <div className="pt-2 border-t border-neutral-200 text-[11px] font-semibold text-purple-800">
-                    Result: T+24h bank settlement + zero payment default
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ======================================================== */}
-        {/* TAB 4: LOW-COST COMPLIANCE & PROFITABILITY HACKS        */}
-        {/* ======================================================== */}
-        {activeTab === 'low-cost-hacks' && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">
-                  Economic Return on Sustainability
-                </span>
-                <h3 className="text-lg font-bold text-neutral-900 mt-0.5">
-                  Low-Cost Implementations That Directly Boost Profitability
-                </h3>
-                <p className="text-xs text-neutral-600 mt-1">
-                  Compliance should never be a cost center. Every blueprint below generates net positive monthly cash flow while satisfying statutory norms.
-                </p>
-              </div>
-
-              <div className="text-right flex-shrink-0">
-                <span className="text-xs text-neutral-500 block">Avg. Cluster Profit Lift</span>
-                <span className="text-2xl font-black text-[#1B5E20]">+₹38,000 / mo</span>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  window.print();
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold text-white bg-[#191C1E] hover:bg-neutral-800 transition-colors cursor-pointer shadow-xs"
+              >
+                <Printer className="w-4 h-4" />
+                <span>Print Dossier</span>
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {lowCostHacks.map((hack, hIdx) => (
-                <div
-                  key={hIdx}
-                  className="bg-white rounded-3xl border border-neutral-200/90 shadow-xs p-6 space-y-4 flex flex-col justify-between hover:shadow-md transition-all"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider">
-                        {hack.category}
-                      </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
-                        {hack.paybackPeriod}
-                      </span>
+            {/* Official Passport Card */}
+            <div className="bg-white rounded-3xl border-2 border-neutral-300 p-8 shadow-md space-y-6 relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-neutral-100 pb-6">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-black text-sm">
+                      LG
                     </div>
-
-                    <h4 className="text-lg font-bold text-[#191C1E]">
-                      {hack.title}
-                    </h4>
-
-                    {/* Cost vs Savings Matrix */}
-                    <div className="grid grid-cols-2 gap-3 p-3.5 rounded-2xl bg-neutral-50 border border-neutral-100 text-xs">
-                      <div>
-                        <span className="text-neutral-400 block text-[10px] uppercase font-bold">
-                          Capital Outlay:
-                        </span>
-                        <span className="font-bold text-neutral-800 text-sm">
-                          {hack.equipmentCost}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-neutral-400 block text-[10px] uppercase font-bold">
-                          Monthly Direct Savings:
-                        </span>
-                        <span className="font-extrabold text-[#166534] text-sm">
-                          {hack.monthlySavings}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Step by Step Action */}
-                    <div className="space-y-1.5 text-xs text-neutral-700">
-                      <span className="font-bold text-neutral-800 block text-[11px]">
-                        Implementation Roadmap:
-                      </span>
-                      {hack.stepByStepAction.map((step, sIdx) => (
-                        <div key={sIdx} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0 mt-0.5" />
-                          <span className="text-[11px] leading-relaxed">{step}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500">
-                    <span className="text-emerald-700 font-medium">
-                      Govt Subsidy: {hack.governmentSubsidy}
-                    </span>
-                    <span className="font-bold text-neutral-800">
-                      High ROI
+                    <span className="text-sm font-black tracking-tight text-neutral-900">
+                      LoopGrid Statutory Registry
                     </span>
                   </div>
+                  <h2 className="text-2xl font-black text-neutral-900 mt-2">
+                    {profile.name}
+                  </h2>
+                  <span className="text-xs text-neutral-500 font-mono">
+                    UDYAM-KR-03-0098412 • Primary MSME Manufacturing Unit
+                  </span>
                 </div>
-              ))}
+
+                <div className="text-right">
+                  <div className="inline-block p-2 bg-neutral-50 rounded-xl border border-neutral-200">
+                    <QrCode className="w-16 h-16 text-neutral-800 mx-auto" />
+                    <span className="text-[9px] font-mono text-neutral-400 block mt-1">VERIFY ONLINE</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Core Credentials Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
+                <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-100">
+                  <span className="text-[10px] text-neutral-400 block">ZED STATUS</span>
+                  <strong className="text-blue-700 text-sm">SILVER TIER</strong>
+                </div>
+                <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-100">
+                  <span className="text-[10px] text-neutral-400 block">HEALTH SCORE</span>
+                  <strong className="text-emerald-700 text-sm">{complianceHealthPercent}% (GRADE A)</strong>
+                </div>
+                <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-100">
+                  <span className="text-[10px] text-neutral-400 block">CPCB FORM-10</span>
+                  <strong className="text-neutral-800 text-sm">VERIFIED ACTIVE</strong>
+                </div>
+                <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-100">
+                  <span className="text-[10px] text-neutral-400 block">VALID UNTIL</span>
+                  <strong className="text-neutral-800 text-sm">OCT 31, 2029</strong>
+                </div>
+              </div>
+
+              {/* Statutory Manifest Summary */}
+              <div className="space-y-2 text-xs">
+                <span className="font-bold text-neutral-900 text-sm block">
+                  Complied Statutory Mandates & Clean Traceability
+                </span>
+                <div className="divide-y divide-neutral-100 border border-neutral-200 rounded-2xl overflow-hidden">
+                  <div className="p-3 bg-neutral-50 flex justify-between font-semibold">
+                    <span>Statutory Requirement</span>
+                    <span>Regulatory Framework</span>
+                    <span>Status</span>
+                  </div>
+                  <div className="p-3 flex justify-between">
+                    <span>GSTR-3B Scrap Tax Filing</span>
+                    <span className="text-neutral-500">GSTN Council</span>
+                    <span className="text-emerald-700 font-bold">Complied</span>
+                  </div>
+                  <div className="p-3 flex justify-between">
+                    <span>Hazardous Scrap Manifest Form 10</span>
+                    <span className="text-neutral-500">CPCB Rules 2016</span>
+                    <span className="text-emerald-700 font-bold">Complied</span>
+                  </div>
+                  <div className="p-3 flex justify-between">
+                    <span>Consent to Operate (CTO) Air/Water</span>
+                    <span className="text-neutral-500">SPCB Karnataka</span>
+                    <span className="text-blue-700 font-bold">In-Renewal</span>
+                  </div>
+                  <div className="p-3 flex justify-between">
+                    <span>Power Factor APFC (&gt;0.98)</span>
+                    <span className="text-neutral-500">BEE Guidelines</span>
+                    <span className="text-emerald-700 font-bold">Complied (1.5% Rebate)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs text-emerald-900 flex items-center justify-between">
+                <div>
+                  <span className="font-bold block">Digital Ledger Hash</span>
+                  <span className="font-mono text-[11px] text-emerald-800">
+                    sha256: 4f98e2c071d5b3a4a7610fae829dc7792e31f903e1a0b5f128e47c7d912
+                  </span>
+                </div>
+                <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold">
+                  ✓
+                </div>
+              </div>
             </div>
           </div>
         )}
       </main>
+
+      {/* ======================================================== */}
+      {/* 1-CLICK FILING SUCCESS MODAL                             */}
+      {/* ======================================================== */}
+      {filingSuccessModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl border border-neutral-200 animate-in fade-in zoom-in-95">
+            <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+              <CheckCircle className="w-8 h-8 stroke-[2.5]" />
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-xl font-black text-neutral-900">
+                Filing Successfully Recorded!
+              </h3>
+              <p className="text-xs text-neutral-600">
+                {filingSuccessModal.taskTitle} has been synchronized with the {filingSuccessModal.authority} statutory server.
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-neutral-50 border border-neutral-200 text-left text-xs space-y-2 font-mono">
+              <div className="flex justify-between">
+                <span className="text-neutral-400">Acknowledgement ARN:</span>
+                <span className="font-bold text-neutral-800">{filingSuccessModal.receiptNumber}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-neutral-400">Status:</span>
+                <span className="font-bold text-emerald-700">COMPLIED</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-neutral-400">Compliance Health:</span>
+                <span className="font-bold text-blue-700">+3% Boost</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setFilingSuccessModal(null)}
+              className="w-full py-2.5 rounded-full text-xs font-bold text-white bg-[#191C1E] hover:bg-neutral-800 transition-colors cursor-pointer"
+            >
+              Continue to Compliance Hub
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* RECEIPT PREVIEW MODAL                                    */}
+      {/* ======================================================== */}
+      {selectedReceipt && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-neutral-200">
+            <div className="flex justify-between items-center pb-2 border-b border-neutral-100">
+              <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+                Statutory Acknowledgement Receipt
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedReceipt(null)}
+                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-neutral-50 text-xs font-mono space-y-2 border border-neutral-200">
+              <div className="flex justify-between">
+                <span>Receipt Ref:</span>
+                <strong className="text-neutral-900">{selectedReceipt}</strong>
+              </div>
+              <div className="flex justify-between">
+                <span>Enterprise:</span>
+                <span className="text-neutral-800">{profile.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Verified Authority:</span>
+                <span className="text-emerald-700">Dept of Factories & Boilers / CPCB</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Validity:</span>
+                <span className="text-neutral-800">Until Oct 31, 2027</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setSelectedReceipt(null)}
+              className="w-full py-2.5 rounded-full text-xs font-bold text-neutral-800 bg-neutral-100 hover:bg-neutral-200 cursor-pointer"
+            >
+              Close Receipt
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* APPLY FOR SCHEME MODAL                                   */}
+      {/* ======================================================== */}
+      {applySchemeModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 space-y-4 shadow-2xl border border-neutral-200 animate-in fade-in zoom-in-95">
+            <div className="flex justify-between items-center pb-3 border-b border-neutral-100">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  Direct Government MSME Desk
+                </span>
+                <h3 className="text-lg font-bold text-neutral-900 mt-1">
+                  Apply for {applySchemeModal.name}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setApplySchemeModal(null)}
+                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-100 text-xs space-y-2 text-neutral-600">
+              <p className="leading-relaxed">
+                LoopGrid has pre-populated your application dossier with verified KYC, Udyam Registration, and DRP material ledger certificates.
+              </p>
+              <div className="pt-2 border-t border-neutral-200 space-y-1.5 font-mono">
+                <div className="flex justify-between text-neutral-800 font-semibold">
+                  <span>Applicant Enterprise:</span>
+                  <span>{profile.name}</span>
+                </div>
+                <div className="flex justify-between text-neutral-800 font-semibold">
+                  <span>Incentive Subvention:</span>
+                  <span className="text-emerald-700">{applySchemeModal.subsidyRate}</span>
+                </div>
+                <div className="flex justify-between text-neutral-800 font-semibold">
+                  <span>Concessional Rate:</span>
+                  <span className="text-blue-700">{applySchemeModal.concessionalRate}</span>
+                </div>
+                <div className="flex justify-between text-neutral-800 font-semibold">
+                  <span>Collateral Status:</span>
+                  <span className="text-neutral-700">{applySchemeModal.collateral}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setApplySchemeModal(null)}
+                className="flex-1 py-2.5 rounded-full text-xs font-bold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmSchemeApplication}
+                className="flex-1 py-2.5 rounded-full text-xs font-bold text-white bg-[#00875A] hover:bg-[#065F46] cursor-pointer shadow-xs"
+              >
+                Submit Application to SIDBI
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* SCHEME DETAIL MODAL                                      */}
+      {/* ======================================================== */}
+      {schemeDetailModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-7 space-y-4 shadow-2xl border border-neutral-200 animate-in fade-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-start pb-3 border-b border-neutral-100">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block">
+                  {schemeDetailModal.agency}
+                </span>
+                <h3 className="text-xl font-bold text-neutral-900 mt-0.5">
+                  {schemeDetailModal.name}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSchemeDetailModal(null)}
+                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
+              {schemeDetailModal.description}
+            </p>
+
+            <div className="p-4 rounded-2xl bg-neutral-50 border border-neutral-200 text-xs space-y-2">
+              <span className="font-bold text-neutral-900 block">Key Scheme Advantages:</span>
+              <ul className="space-y-1.5 text-neutral-600">
+                {schemeDetailModal.keyBenefits.map((benefit, bIdx) => (
+                  <li key={bIdx} className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                    <span>{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="text-xs text-neutral-500 space-y-1">
+              <span className="font-bold text-neutral-800 block">Eligibility Criteria:</span>
+              <p>{schemeDetailModal.eligibility}</p>
+            </div>
+
+            <div className="pt-2 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setSchemeDetailModal(null)}
+                className="flex-1 py-2.5 rounded-full text-xs font-bold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 cursor-pointer"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const s = schemeDetailModal;
+                  setSchemeDetailModal(null);
+                  handleApplyScheme(s);
+                }}
+                className="flex-1 py-2.5 rounded-full text-xs font-bold text-white bg-[#191C1E] hover:bg-neutral-800 cursor-pointer shadow-xs"
+              >
+                Proceed to Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* ZED UPGRADE TO GOLD MODAL                                */}
+      {/* ======================================================== */}
+      {zedUpgradeModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 space-y-4 shadow-2xl border border-neutral-200 animate-in fade-in zoom-in-95">
+            <div className="flex justify-between items-center pb-3 border-b border-neutral-100">
+              <div className="flex items-center gap-2">
+                <Award className="w-5 h-5 text-blue-600" />
+                <h3 className="text-lg font-bold text-neutral-900">
+                  ZED Silver to Gold Upgrade Desk
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setZedUpgradeModalOpen(false)}
+                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs text-neutral-600">
+              <p>
+                Your enterprise currently holds <strong className="text-blue-700">ZED Silver Tier (14 Parameters Cleared)</strong>. Upgrading to <strong className="text-amber-600">Gold Tier (20 Parameters)</strong> unlocks:
+              </p>
+              <ul className="list-disc pl-5 space-y-1.5 text-neutral-700">
+                <li>Up to <strong>₹5,00,000 Govt Grant</strong> for Quality Council of India consulting handholding.</li>
+                <li><strong>0.5% interest rate rebate</strong> on all public sector term loans (SBI, PNB, Canara).</li>
+                <li>Priority allocation on MSME Government e-Marketplace (GeM) tenders.</li>
+                <li>Exemption from routine SPCB consent inspections under Green Channel.</li>
+              </ul>
+            </div>
+
+            <div className="pt-2 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setZedUpgradeModalOpen(false)}
+                className="flex-1 py-2.5 rounded-full text-xs font-bold text-neutral-700 bg-neutral-100 hover:bg-neutral-200 cursor-pointer"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmZedUpgrade}
+                className="flex-1 py-2.5 rounded-full text-xs font-bold text-white bg-blue-700 hover:bg-blue-800 cursor-pointer shadow-md"
+              >
+                Begin Gold Assessment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* ZED INFO GUIDELINES MODAL                                */}
+      {/* ======================================================== */}
+      {zedInfoModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 space-y-4 shadow-2xl border border-neutral-200 animate-in fade-in zoom-in-95">
+            <div className="flex justify-between items-center pb-3 border-b border-neutral-100">
+              <h3 className="text-lg font-bold text-neutral-900">
+                ZED Scheme Overview & Parameters
+              </h3>
+              <button
+                type="button"
+                onClick={() => setZedInfoModalOpen(false)}
+                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs text-neutral-600 leading-relaxed max-h-80 overflow-y-auto">
+              <p>
+                The <strong>MSME Sustainable (ZED) Certification Scheme</strong> was launched by the Ministry of MSME to enable Indian manufacturers to achieve global quality benchmarks with minimal environmental degradation.
+              </p>
+              <div className="space-y-2">
+                <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-100">
+                  <strong className="text-neutral-900 block">Zero Defect Focus:</strong>
+                  Production with minimal rework, waste reduction, precision grading, and standardized secondary scrap recovery.
+                </div>
+                <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-100">
+                  <strong className="text-neutral-900 block">Zero Effect Focus:</strong>
+                  Zero air/water pollution, zero industrial landfill dumping, carbon footprint mitigation, and maximum circular feedstock reuse.
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setZedInfoModalOpen(false)}
+                className="w-full py-2.5 rounded-full text-xs font-bold text-neutral-800 bg-neutral-100 hover:bg-neutral-200 cursor-pointer"
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

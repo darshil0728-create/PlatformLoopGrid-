@@ -852,6 +852,23 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
               </span>
             </button>
 
+            {/* COMPLIANCE & GREEN MSME (Score, Statutory Engine, ZED & Govt Green Schemes) */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('compliance-score')}
+              className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+                (activeTab as string) === 'compliance-score'
+                  ? 'bg-[#191C1E] text-white shadow-xs'
+                  : 'bg-white text-neutral-700 hover:text-neutral-900 border border-neutral-200 hover:bg-neutral-50'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Compliance & Green MSME</span>
+              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+                Score
+              </span>
+            </button>
+
             <button
               type="button"
               onClick={() => setActiveTab('waste-diversion')}
