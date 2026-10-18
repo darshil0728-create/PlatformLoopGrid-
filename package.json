@@ -1,7 +1,13 @@
 {
-  "name": "react-example",
+  "name": "platform-loopgrid",
+  "description": "LoopGrid - AI-Powered Circular Economy & Secondary Resource Exchange Platform for Indian MSMEs",
+  "homepage": "https://github.com/darshil0728-create/PlatformLoopGrid-#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/darshil0728-create/PlatformLoopGrid-.git"
+  },
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
