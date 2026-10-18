@@ -465,10 +465,12 @@ export const SupportPage: React.FC<SupportPageProps> = ({
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
 
-                <button
-                  type="button"
-                  className="w-full inline-flex items-center justify-between px-4 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-bold transition-all border border-neutral-700"
-                  title="GitHub Repository (Expression not bound)"
+                <a
+                  href="https://github.com/darshil0728-create/PlatformLoopGrid-"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full inline-flex items-center justify-between px-4 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white text-xs font-bold transition-all border border-neutral-700 cursor-pointer"
+                  title="View PlatformLoopGrid Repository on GitHub"
                 >
                   <div className="flex items-center gap-2">
                     <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -476,8 +478,8 @@ export const SupportPage: React.FC<SupportPageProps> = ({
                     </svg>
                     <span>View GitHub Project</span>
                   </div>
-                  <span className="text-[10px] text-neutral-500">Repository</span>
-                </button>
+                  <ExternalLink className="w-3.5 h-3.5 text-neutral-400" />
+                </a>
               </div>
             </div>
 
