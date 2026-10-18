@@ -1,0 +1,7 @@
+{
+  "name": "LoopGrid",
+  "description": "AI-driven circular economy platform aggregating MSME unwanted industrial resources into categorized inventory lots, matched with nearby processing enterprises with managed transit and real-time financial settlement.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
