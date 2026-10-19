@@ -28,36 +28,36 @@ export const HowItWorksSection: React.FC = () => {
     },
     {
       step: '02',
-      title: 'AI Analyzes & Matches Resources',
-      subtitle: 'Spectrometric grade assays & proximity routing',
+      title: 'AI Analyzes & Live Prices (₹/kg)',
+      subtitle: 'Real-time commodity spot rates & proximity pooling',
       description:
-        'LoopGrid’s algorithmic clearinghouse verifies NABL purity benchmarks and matches lots with nearby secondary smelters and remanufacturers, pooling micro-batches into consolidated truckloads.',
+        'LoopGrid’s algorithmic engine verifies alloy purity assays and tracks Live Prices per kilogram (₹/kg) based on real market changes, LME parity, and regional smelter demand, pooling lots within short radii.',
       icon: Cpu,
       badgeColor: 'bg-sky-50 text-sky-800 border-sky-200',
       accentColor: 'text-sky-600',
-      keyMetric: 'Sub-50km Proximity Pooling',
+      keyMetric: 'Real-Time ₹/kg Exchange',
     },
     {
       step: '03',
-      title: 'Businesses Trade or Donate Materials',
-      subtitle: 'Transparent spot rates & integrated trade credit',
+      title: 'Marketplace Trading & Credit Facility',
+      subtitle: 'Verified inventory procurement & working capital',
       description:
-        'Enterprises execute purchases at real-time per-kilogram (₹/kg) exchange prices. Buyers can utilize our integrated working capital credit facility, while sellers enjoy guaranteed RBI PA/PG escrow payouts.',
+        'Processing enterprises browse active lots in the Marketplace. Liquidity-constrained buyers can tap pre-approved credit facilities (SIDBI/CGTMSE/NBFCs) with 30–90 day terms. Purchased lots automatically update and exit the public marketplace.',
       icon: ArrowLeftRight,
       badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
       accentColor: 'text-amber-600',
-      keyMetric: 'RBI Compliant Escrow',
+      keyMetric: 'Integrated Credit & Escrow',
     },
     {
       step: '04',
-      title: 'Environmental Impact Is Reduced',
-      subtitle: 'Zero-landfill diversion & CPCB Form-10 manifests',
+      title: 'Environmental Impact & Compliance',
+      subtitle: '100-point compliance index & ZED subsidies',
       description:
-        'Byproducts bypass municipal dumps into circular manufacturing streams. Each transaction generates immutable CPCB Schedule-II documentation and abates up to 92% of virgin ore energy emissions.',
+        'Secondary feedstocks bypass municipal landfills, abating virgin ore emissions. Every transaction issues CPCB Form-10 manifests and feeds the enterprise Compliance Score to claim up to 80% ZED green subsidies.',
       icon: Recycle,
       badgeColor: 'bg-purple-50 text-purple-800 border-purple-200',
       accentColor: 'text-purple-600',
-      keyMetric: '100% Audit Verifiability',
+      keyMetric: 'ZED & CPCB Form-10 Audit',
     },
   ];
 

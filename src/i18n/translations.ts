@@ -16,9 +16,19 @@ export const LANGUAGES: LanguageOption[] = [
   { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ', region: 'Peenya, Bengaluru, Belagavi' },
 ];
 
+export type FaqCategory =
+  | 'registration'
+  | 'inventory'
+  | 'prices'
+  | 'marketplace'
+  | 'compliance'
+  | 'transit'
+  | 'settlement'
+  | 'processing';
+
 export interface FaqItem {
   id: number;
-  category: 'registration' | 'inventory' | 'transit' | 'settlement' | 'processing';
+  category: FaqCategory;
   categoryLabel: string;
   question: string;
   answer: string;
@@ -52,6 +62,8 @@ export interface Translations {
     card2Desc: string;
     card3Title: string;
     card3Desc: string;
+    card4Title?: string;
+    card4Desc?: string;
   };
   problem: {
     badge: string;
@@ -244,6 +256,12 @@ export interface Translations {
     q4: string;
     a4: string;
     tag4: string;
+    q5?: string;
+    a5?: string;
+    tag5?: string;
+    q6?: string;
+    a6?: string;
+    tag6?: string;
   };
   cta: {
     badge: string;
@@ -478,6 +496,9 @@ export interface Translations {
     catAll: string;
     catReg: string;
     catInv: string;
+    catPrices?: string;
+    catMarketplace?: string;
+    catCompliance?: string;
     catTransit: string;
     catSettlement: string;
     catProcessing: string;
@@ -512,15 +533,17 @@ const enTranslations: Translations = {
     headlineStart: 'Turn Unusable Operational Scrap into',
     headlineHighlight: 'Guaranteed Revenue',
     subtitle:
-      'MSMEs register unwanted leftover resources they cannot utilize internally. LoopGrid pools them into categorized inventory lots, matches nearby processing buyers via AI to minimize transport costs, dispatches pre-negotiated transit partners, and executes real-time payouts.',
+      'MSMEs register unusable operational scrap they cannot recycle internally. LoopGrid tracks real-time Live Prices per kilogram, pools scrap into categorized lots with Digital Resource Passports, allows Processing Enterprises to procure with an integrated credit facility, and optimizes statutory compliance with ZED subsidies.',
     startBtn: 'Register Unwanted Scrap',
     howItWorksBtn: 'Explore 5-Step Process',
-    card1Title: 'Environmental Impact First',
-    card1Desc: 'Directly divert tons of unusable manufacturing offcuts from landfills, shrinking industrial carbon footprints and avoiding virgin ore extraction.',
-    card2Title: 'Categorized Lot Inventory',
-    card2Desc: 'LoopGrid groups fragmented scrap into standardized, chemical-spec inventory lots that processing enterprises can buy in bulk.',
-    card3Title: 'Automated Transit & Settlements',
-    card3Desc: 'AI selects the closest buyer, assigns transit partners with fixed per-km rates, and disburses payments in real time.',
+    card1Title: 'Categorized Lots & DRPs',
+    card1Desc: 'LoopGrid groups fragmented scrap into standardized, chemical-spec inventory lots backed by sovereign Digital Resource Passports.',
+    card2Title: 'Live Prices Exchange (₹/kg)',
+    card2Desc: 'Real-time spot price fluctuations linked to LME and domestic demand benchmarks with interactive mathematical calculation transparency.',
+    card3Title: 'Marketplace & Credit Facility',
+    card3Desc: 'Processing enterprises buy verified lots directly or access integrated working capital credit lines (SIDBI/CGTMSE/NBFCs) for 30–90 day terms.',
+    card4Title: 'Compliance & Green MSME Center',
+    card4Desc: '100-point statutory compliance scoring, CPCB Form-10 manifests, and official ZED certification subsidies up to 80%.',
   },
   problem: {
     badge: 'The MSME Operational Scrap Challenge',
@@ -655,16 +678,16 @@ const enTranslations: Translations = {
     step1Desc: 'Factory owners register unusable leftover materials, offcuts, and process scrap that cannot be recycled within their operational cycle.',
     step1Tag: 'Zero shop-floor clutter',
     step2Title: 'Categorized Inventory Pool',
-    step2Desc: 'LoopGrid aggregates registered materials into a structured inventory system, pooling identical categories, grades, and chemical specs.',
+    step2Desc: 'LoopGrid aggregates registered materials into a structured inventory system, pooling identical categories, grades, and chemical specs with DRPs.',
     step2Tag: 'Commercial lot standardization',
-    step3Title: 'Processing Enterprise Lots',
-    step3Desc: 'Industrial processing enterprises browse categorized lots and purchase high-volume raw inputs matching their exact manufacturing requirements.',
-    step3Tag: 'Bulk lot procurement',
+    step3Title: 'Processing Marketplace & Credit Facility',
+    step3Desc: 'Industrial processing enterprises browse categorized lots and purchase high-volume raw inputs matching their requirements, with access to an integrated credit facility.',
+    step3Tag: 'Bulk procurement & credit',
     step4Title: 'AI Proximity & Transit Allotment',
     step4Desc: 'Our AI algorithm matches the nearest available processing buyer to slash transport distance, and instantly assigns a verified transit partner with pre-negotiated per-km rates.',
     step4Tag: 'Lowest freight cost & CO₂',
-    step5Title: 'Real-Time Economic Split',
-    step5Desc: 'LoopGrid collects funds from the buyer in real time, retains our platform commission, pays the transit partner per km, and disburses guaranteed net earnings to the MSME.',
+    step5Title: 'Real-Time Economic Split & DRP Update',
+    step5Desc: 'LoopGrid clears the transaction, pays the transit partner per km, disburses net earnings to the MSME, and updates the DRP to remove the lot from the active marketplace.',
     step5Tag: 'Immediate payment settlement',
     flowBadge: 'Transparent Settlement Architecture',
     flowTitle: 'How the LoopGrid Financial & Logistics Flow Works',
@@ -679,7 +702,7 @@ const enTranslations: Translations = {
     wf1Tag: '1. Buyer Payment Inflow',
     wf1Buyer: 'Processing Enterprise',
     wf1Val: '100% Lot Value',
-    wf1Desc: 'Pays full invoice amount for standardized inventory lot directly to LoopGrid.',
+    wf1Desc: 'Pays full invoice amount for standardized inventory lot directly to LoopGrid (or via integrated credit facility).',
     wf2Tag: '2. LoopGrid Platform Share',
     wf2Name: 'LoopGrid Commission',
     wf2Share: 'Platform Share',
@@ -691,28 +714,34 @@ const enTranslations: Translations = {
     wf4Tag: '4. MSME Supplier Payout',
     wf4Recipient: 'MSME Enterprise Owner',
     wf4Method: 'Direct Bank Transfer',
-    wf4Desc: 'Guaranteed net payout for previously unusable scrap, directly to bank account.',
+    wf4Desc: 'Guaranteed net payout for previously unusable scrap, directly to bank account within 24h.',
     registerBtn: 'Register Unusable MSME Scrap',
   },
   faqTeaser: {
     badge: 'Frequently Asked Questions',
-    title: 'Common Questions on Inventory, Transit & Payouts',
-    subtitle: 'Everything you need to know about registering unusable scrap, inventory lot purchasing, transit partner allocation, and automated payment distribution.',
+    title: 'Platform Operations, Live Prices, Credit & Settlements',
+    subtitle: 'Everything you need to know about scrap registration, Live Prices per kg, processing marketplace purchases with credit facility, and automated payouts.',
     viewAllBtn: 'View Full FAQ Page',
-    bannerTitle: 'Need more operational or transit details?',
-    bannerDesc: 'Explore our full knowledge base covering quality grading, transit partner onboarding, per-km rates, and real-time payment splits.',
+    bannerTitle: 'Need deep-dive operational, credit or compliance details?',
+    bannerDesc: 'Explore our full knowledge base covering Live Prices calculation, marketplace credit facilities, ZED certification subsidies, and per-km transit rates.',
     q1: 'How do MSMEs register unwanted scrap they cannot utilize in their operational cycle?',
-    a1: 'MSME enterprise owners log into the portal and register their leftover materials—such as metal cuttings, plastic trimmings, fabric offcuts, or chemical residues—which cannot be recycled or re-used in their existing manufacturing cycle. They input the material type, dimensions/specifications, estimated volume, and factory location.',
+    a1: 'MSME enterprise owners sign into their account and register leftover materials—such as CNC lathe turnings, metal offcuts, plastic sprues, or fabric offcuts—which cannot re-enter their machine cycle. They input material type, dimensions, estimated weight, and location to generate an initial Digital Resource Passport (DRP).',
     tag1: 'Scrap Registration',
-    q2: 'How does LoopGrid’s categorized inventory system work for processing buyers?',
-    a2: 'LoopGrid pools together registered resources of the same category, purity grade, and physical specifications from multiple nearby MSMEs into cohesive commercial inventory lots. Processing enterprises that require secondary feedstocks browse these categorized lots and purchase them in bulk according to their production requirements.',
-    tag2: 'Categorized Inventory',
-    q3: 'How does the AI select nearby buyers and assign transit partners with fixed per-km rates?',
-    a3: 'Transport is the biggest cost factor in material recovery. Our AI algorithm calculates geographic proximity to find the nearest qualified processing enterprise, minimizing total transit kilometers. The platform then instantly assigns a contracted transit partner whose cost-per-kilometer tariff has already been pre-agreed with LoopGrid.',
-    tag3: 'AI Proximity & Transit',
-    q4: 'How does the buy-sell transaction and payment split work between all parties?',
-    a4: 'LoopGrid processes the transaction in real time. We collect the full lot payment from the processing enterprise. Our economic settlement engine then retains LoopGrid’s commission, pays the transit partner based on the pre-decided per-kilometer rate, and disburses the net sales proceeds directly to the MSME partner’s bank account upon dock delivery.',
-    tag4: 'Real-Time Payment Split',
+    q2: 'How does the "Live Prices" exchange work and how are prices calculated per kilogram?',
+    a2: 'Live Prices display real-time commodity exchange rates per kilogram (₹/kg) for all secondary resources traded on the platform. Prices fluctuate dynamically based on domestic and LME parity, alloy purity assays, transit coefficients, and regional smelter demand, fully explained in our interactive calculation guide.',
+    tag2: 'Live Prices (₹/kg)',
+    q3: 'How does the Marketplace work for Processing Enterprises and what is the Integrated Credit Facility?',
+    a3: 'Processing buyers browse verified inventory lots in their dedicated Marketplace. If an enterprise lacks immediate liquid capital, they can purchase on 30, 60, or 90-day credit terms through pre-integrated credit facilities (SIDBI, CGTMSE, NBFCs). Upon purchase, the lot is removed from the marketplace and its DRP updates to in-transit.',
+    tag3: 'Marketplace & Credit',
+    q4: 'How does the AI select nearby buyers and assign transit partners with fixed per-km rates?',
+    a4: 'Transport is the biggest cost hurdle in circular materials. LoopGrid’s AI matches lots with processing facilities within the closest geographic radius to slash road kilometers, and assigns verified commercial transit fleets contracted at pre-negotiated, fixed per-kilometer tariffs.',
+    tag4: 'AI Proximity Transit',
+    q5: 'How does the buy-sell transaction and payment split work between all parties?',
+    a5: 'LoopGrid manages payment clearance in real time. We collect the full lot invoice from the buyer (or credit partner), retain the platform share, disburse the transit driver\'s per-km fee upon dock weighbridge scan, and credit the net proceeds directly to the MSME seller\'s bank account within 24 hours.',
+    tag5: 'Payment Waterfall',
+    q6: 'What is the Compliance Score and how does LoopGrid help with ZED and Government Green Schemes?',
+    a6: 'The profile\'s compliance button leads to an independent center featuring a 100-point statutory compliance score (CPCB/SPCB, Form-10, EPR, OSHA), an official ZED certification desk with up to 80% MSME subsidies, and a directory of low-interest green transition loans (SIDBI 4E, SPEED Solar, CGTMSE).',
+    tag6: 'Compliance & ZED',
   },
   cta: {
     badge: 'Turn Shop-Floor Waste into Working Capital',
@@ -938,20 +967,23 @@ const enTranslations: Translations = {
     signInBtn: 'Sign In / Register',
     joinBtn: 'Register Scrap Stream',
     badge: 'Knowledge Base & FAQ',
-    title: 'Inventory, Transit & Settlement Guidance',
-    subtitle: 'Clear, actionable answers on registering unusable scrap, lot aggregation, AI proximity matching, pre-negotiated transit, and real-time payment splits.',
-    searchPlaceholder: 'Search by keyword (e.g. registration, inventory lot, proximity, transit partner, per-km, commission)...',
+    title: 'Platform, Live Prices, Credit & Compliance Guidance',
+    subtitle: 'Clear, actionable answers on registering unusable scrap, Live Prices per kg, Marketplace credit facilities, ZED certification subsidies, and real-time payment splits.',
+    searchPlaceholder: 'Search by keyword (e.g. live prices, marketplace, credit facility, ZED, compliance, proximity, transit, per-km)...',
     clear: 'Clear',
     reset: 'Reset filters',
     noResults: 'No questions found matching your search.',
     catAll: 'All Questions',
     catReg: 'Scrap Registration',
     catInv: 'Categorized Lot Inventory',
+    catPrices: 'Live Prices (₹/kg)',
+    catMarketplace: 'Marketplace & Credit',
+    catCompliance: 'Compliance & Govt Schemes',
     catTransit: 'Transit & Per-KM Rates',
     catSettlement: 'Payment Splits',
     catProcessing: 'Processing Buyers',
-    bottomTitle: 'Have questions about your factory scrap stream or fleet partnership?',
-    bottomSubtitle: 'Our circular logistics team works directly with workshop owners, processing mills, and regional transport fleets.',
+    bottomTitle: 'Have questions about your factory scrap stream, credit lines, or fleet partnership?',
+    bottomSubtitle: 'Our industrial circularity team works directly with workshop owners, processing mills, financial partners, and transport fleets.',
     registerBtn: 'Register Scrap Stream',
     backOverviewBtn: 'Back to Overview',
     faqs: [
@@ -960,7 +992,7 @@ const enTranslations: Translations = {
         category: 'registration',
         categoryLabel: 'Scrap Registration',
         question: 'How do MSMEs register unwanted scrap they cannot utilize in their operational cycle?',
-        answer: 'MSME owners log into the portal and register leftover materials—such as metal cuttings, plastic trimmings, fabric offcuts, or chemical residues—which cannot be recycled in their existing manufacturing cycle. They input the material type, dimensions, estimated volume, and factory location.',
+        answer: 'MSME enterprise owners sign into their account and register leftover materials—such as CNC lathe turnings, metal offcuts, plastic sprues, or fabric offcuts—which cannot re-enter their machine cycle. They input material type, dimensions, estimated volume, and loading dock address to generate an initial Digital Resource Passport (DRP).',
       },
       {
         id: 1,
@@ -971,73 +1003,115 @@ const enTranslations: Translations = {
       },
       {
         id: 2,
+        category: 'inventory',
+        categoryLabel: 'Categorized Lot Inventory',
+        question: 'What is a Digital Resource Passport (DRP) and what information does it track?',
+        answer: 'A Digital Resource Passport (DRP) is an immutable digital ledger record attached to every material lot on LoopGrid. It tracks chemical assay purity, moisture and oil percentage, origin factory dock, certified weighbridge gross and tare slips, CPCB Form-10 manifests, and carbon CO₂ abatement offset.',
+      },
+      {
+        id: 3,
+        category: 'prices',
+        categoryLabel: 'Live Prices (₹/kg)',
+        question: 'What is the "Live Prices" exchange and who can access it?',
+        answer: 'The Live Prices exchange acts as a real-time commodity terminal for secondary resources traded on LoopGrid (such as Al 6061 turnings, Copper wire scrap, Brass Honey, POM Delrin, and HDPE). Both Resource Enterprises (MSMEs) and Processing Enterprises see these live rates per kilogram (₹/kg) on their dashboards and profile navigation bars to make informed trading and valuation decisions.',
+      },
+      {
+        id: 4,
+        category: 'prices',
+        categoryLabel: 'Live Prices (₹/kg)',
+        question: 'How are Live Prices calculated and why do they fluctuate in real time?',
+        answer: 'Prices fluctuate dynamically based on domestic and international benchmark indices (LME, MCX), regional supply and demand volume in local industrial clusters, scrap purity assay discounts, transit distance coefficients, and pooled volume bonuses. Users can click "How Prices Are Calculated" in the Live Prices view to inspect the interactive mathematical calculation breakdown.',
+      },
+      {
+        id: 5,
+        category: 'marketplace',
+        categoryLabel: 'Marketplace & Credit',
+        question: 'What is the Marketplace for Processing Enterprises and how does buying inventory work?',
+        answer: 'The Marketplace is a dedicated trading hub available in the Processing Enterprise profile navigation bar. Processing buyers can browse all active, verified inventory lots pooled from MSMEs, view full Digital Resource Passports, compare spot rates, and purchase lots directly using cash or our integrated credit facility.',
+      },
+      {
+        id: 6,
+        category: 'marketplace',
+        categoryLabel: 'Marketplace & Credit',
+        question: 'How does the Integrated Credit Facility work if a Processing Enterprise lacks immediate liquidity?',
+        answer: 'Through our integrated financial institution partners (including SIDBI, CGTMSE-backed credit lines, and NBFCs), processing enterprises can access pre-approved working capital credit lines right within the checkout flow. They can purchase required lots on 30, 60, or 90-day credit terms, ensuring uninterrupted foundry and extrusion operations without straining liquid reserves.',
+      },
+      {
+        id: 7,
+        category: 'marketplace',
+        categoryLabel: 'Marketplace & Credit',
+        question: 'What happens to a resource lot after a Processing Enterprise purchases it?',
+        answer: 'The moment a lot is purchased—via direct funds or the integrated credit facility—its Digital Resource Passport (DRP) status instantly updates to "Purchased / In Transit". The lot is immediately removed from the active public marketplace so it cannot be double-purchased, and geofenced transit dispatch is initiated.',
+      },
+      {
+        id: 8,
+        category: 'compliance',
+        categoryLabel: 'Compliance & Govt Schemes',
+        question: 'What is the Compliance Score in the profile and what does the dedicated Compliance page contain?',
+        answer: 'Clicking the compliance button in the enterprise profile opens a dedicated, comprehensive page. It features a 100-point composite score calibrated against CPCB, SPCB, and MoEFCC statutory mandates, an interactive Statutory Compliance Engine with real-time score updates, an official ZED Certification Desk, a Government Green Schemes Directory, and a Green Capital Loan Simulator.',
+      },
+      {
+        id: 9,
+        category: 'compliance',
+        categoryLabel: 'Compliance & Govt Schemes',
+        question: 'What Indian Government green transition subsidies and credit facilities are accessible through LoopGrid?',
+        answer: 'LoopGrid directly connects Indian MSMEs with official central and state initiatives, including: 1. ZED (Zero Defect Zero Effect) certification subsidies (up to 80% reimbursement for Bronze, Silver, Gold, plus 10% for women/SC-ST/North-East enterprises); 2. SIDBI 4E (End-to-End Energy Efficiency loans at ~7.5% interest); 3. SIDBI SPEED (quick finance for rooftop solar & green machinery); 4. CGTMSE Green Credit Guarantee Scheme (collateral-free coverage up to ₹5 Crore); and 5. PMEGP green transition grants.',
+      },
+      {
+        id: 10,
+        category: 'compliance',
+        categoryLabel: 'Compliance & Govt Schemes',
+        question: 'What low-cost compliance blueprints and frugal engineering hacks are provided?',
+        answer: 'For every statutory requirement (e.g. CPCB Form-10 hazardous waste containment, SPCB consent, OSHA machine guarding), LoopGrid provides frugal engineering hacks—such as modular steel drip trays instead of expensive epoxy flooring, baffle drum oil-water separators, and refurbished color-coded HDPE drums—allowing MSMEs to achieve full compliance at a fraction of standard consulting costs.',
+      },
+      {
+        id: 11,
         category: 'transit',
         categoryLabel: 'Transit & Per-KM Rates',
         question: 'How does the AI select nearby buyers and assign transit partners with fixed per-km rates?',
         answer: 'Transport is the biggest cost factor in material recovery. Our AI algorithm calculates geographic proximity to find the nearest qualified processing enterprise, minimizing total transit kilometers. The platform then instantly assigns a contracted transit partner whose cost-per-kilometer tariff has already been pre-agreed with LoopGrid.',
       },
       {
-        id: 3,
-        category: 'settlement',
-        categoryLabel: 'Payment Splits',
-        question: 'How does the buy-sell transaction and payment split work between all parties?',
-        answer: 'LoopGrid processes the transaction in real time. We collect the full lot payment from the processing enterprise. Our economic settlement engine then retains LoopGrid’s commission, pays the transit partner based on the pre-decided per-kilometer rate, and disburses the net sales proceeds directly to the MSME partner’s bank account upon dock delivery.',
-      },
-      {
-        id: 4,
+        id: 12,
         category: 'transit',
         categoryLabel: 'Transit & Per-KM Rates',
         question: 'How are cost-per-kilometer transit tariffs determined and who pays them?',
         answer: 'LoopGrid pre-negotiates fixed per-kilometer freight tariffs with verified commercial regional fleet operators. The transit cost is calculated strictly based on the route distance between the MSME loading dock and the processing plant. The buyer pays for the complete lot including transit, and LoopGrid directly disburses the transit partner their full tariff upon delivery scan.',
       },
       {
-        id: 5,
-        category: 'inventory',
-        categoryLabel: 'Categorized Lot Inventory',
-        question: 'How does LoopGrid ensure the purity and metallurgical grade of pooled scrap lots?',
-        answer: 'When MSMEs register materials, they provide mill test certificates, alloy designations (e.g. 6061-T6 Aluminum or Virgin HDPE), or photo verification. LoopGrid classifies these into standardized purity lots so processing buyers receive predictable, verified feedstock without batch contamination.',
+        id: 13,
+        category: 'settlement',
+        categoryLabel: 'Payment Splits',
+        question: 'How does the buy-sell transaction and payment split work between all parties?',
+        answer: 'LoopGrid processes the transaction in real time. We collect the full lot payment from the processing enterprise (or credit partner). Our economic settlement engine then retains LoopGrid’s commission, pays the transit partner based on the pre-decided per-kilometer rate, and disburses the net sales proceeds directly to the MSME partner’s bank account upon dock delivery.',
       },
       {
-        id: 6,
+        id: 14,
         category: 'settlement',
         categoryLabel: 'Payment Splits',
         question: 'How quickly does the MSME receive their money after the scrap leaves the factory?',
-        answer: 'The processing enterprise pays LoopGrid upfront when ordering the lot. Once our transit partner delivers the lot to the buyer’s dock and the intake scan is verified, LoopGrid immediately executes the payment split: paying the transit driver and transferring the net sales proceeds directly to the MSME’s bank account within 24 business hours.',
+        answer: 'The processing enterprise pays LoopGrid upfront when ordering the lot (or financing clears). Once our transit partner delivers the lot to the buyer’s dock and the intake weighbridge scan is verified, LoopGrid immediately executes the payment split: paying the transit driver and transferring the net sales proceeds directly to the MSME’s bank account within 24 business hours.',
       },
       {
-        id: 7,
+        id: 15,
         category: 'processing',
         categoryLabel: 'Processing Buyers',
         question: 'How do processing enterprises purchase aggregated lots according to their requirements?',
-        answer: 'Processing mills and recycling enterprises log into the LoopGrid portal, specify their monthly raw material input requirements (e.g., 20 tons of 304 Stainless scrap or 5 tons of clean PP purgings), and browse categorized lots available in their regional radius.',
+        answer: 'Processing mills, secondary foundries, and recycling plants browse categorized lots in the Marketplace, filter by material grade and location, review spectrometric assays, and complete checkout using direct payment or pre-approved trade credit terms.',
       },
       {
-        id: 8,
+        id: 16,
         category: 'registration',
         categoryLabel: 'Scrap Registration',
         question: 'What types of unusable resources can an MSME register?',
         answer: 'Any solid manufacturing residual that cannot be re-used in your facility’s existing machines—including CNC lathe turnings, metal offcuts, punching trimmings, injection molding sprues, technical textile cutoffs, veneer scraps, and agro-processing pomace.',
       },
       {
-        id: 9,
+        id: 17,
         category: 'registration',
         categoryLabel: 'Scrap Registration',
-        question: 'Is there a minimum quantity threshold to register unusable scrap on LoopGrid?',
-        answer: 'No heavy minimums. You can list as little as 200 kg or 1 standard industrial pallet. LoopGrid’s multi-party pooling engine aggregates small batches from nearby facilities in the same industrial cluster until an efficient truckload lot is formed.',
-      },
-      {
-        id: 10,
-        category: 'transit',
-        categoryLabel: 'Transit & Per-KM Rates',
-        question: 'Who manages the loading, unloading, and transit insurance during transportation?',
-        answer: 'The MSME loads the material onto the assigned transit vehicle at their factory dock. The commercial carrier verifies the batch weight and manifest, while transit insurance and goods-in-transit documentation are managed through LoopGrid’s automated digital logistics network.',
-      },
-      {
-        id: 11,
-        category: 'settlement',
-        categoryLabel: 'Payment Splits',
-        question: 'What happens if a processing buyer disputes the scrap specifications upon arrival?',
-        answer: 'Because lots are standardized and photographed at registration, disputes are rare. In case of variance, LoopGrid holds funds in escrow and dispatches an authorized regional inspector to reconcile the batch within 12 hours.',
+        question: 'How does account creation work and how do I access my profile dashboard?',
+        answer: 'Before registering a resource or purchasing inventory, enterprises create an account with their Enterprise Name, Phone, Email, Business Focus, Core Resources, and Role (MSME Supplier, Processing Buyer, or Transit Partner). Upon submission, they are immediately redirected to their sovereign Profile Page where their inventory listings, Live Prices, Marketplace, and Compliance Score reside.',
       },
     ],
   },

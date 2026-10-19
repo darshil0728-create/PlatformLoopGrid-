@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HelpCircle, ChevronDown, ChevronUp, ArrowRight, DollarSign, Package, ShieldCheck, Truck } from 'lucide-react';
+import { HelpCircle, ChevronDown, ChevronUp, ArrowRight, DollarSign, Package, ShieldCheck, Truck, TrendingUp, ShoppingCart } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 interface FaqTeaserSectionProps {
@@ -15,19 +15,19 @@ export const FaqTeaserSection: React.FC<FaqTeaserSectionProps> = ({ onNavigateTo
       question: t.faqTeaser.q1,
       answer: t.faqTeaser.a1,
       tag: t.faqTeaser.tag1,
-      icon: DollarSign,
+      icon: Package,
     },
     {
       question: t.faqTeaser.q2,
       answer: t.faqTeaser.a2,
       tag: t.faqTeaser.tag2,
-      icon: Package,
+      icon: TrendingUp,
     },
     {
       question: t.faqTeaser.q3,
       answer: t.faqTeaser.a3,
       tag: t.faqTeaser.tag3,
-      icon: ShieldCheck,
+      icon: ShoppingCart,
     },
     {
       question: t.faqTeaser.q4,
@@ -35,6 +35,26 @@ export const FaqTeaserSection: React.FC<FaqTeaserSectionProps> = ({ onNavigateTo
       tag: t.faqTeaser.tag4,
       icon: Truck,
     },
+    ...(t.faqTeaser.q5 && t.faqTeaser.a5
+      ? [
+          {
+            question: t.faqTeaser.q5,
+            answer: t.faqTeaser.a5,
+            tag: t.faqTeaser.tag5 || 'Payment Waterfall',
+            icon: DollarSign,
+          },
+        ]
+      : []),
+    ...(t.faqTeaser.q6 && t.faqTeaser.a6
+      ? [
+          {
+            question: t.faqTeaser.q6,
+            answer: t.faqTeaser.a6,
+            tag: t.faqTeaser.tag6 || 'Compliance & ZED',
+            icon: ShieldCheck,
+          },
+        ]
+      : []),
   ];
 
   const toggleAccordion = (index: number) => {
@@ -78,10 +98,10 @@ export const FaqTeaserSection: React.FC<FaqTeaserSectionProps> = ({ onNavigateTo
                       <Icon className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-xs font-semibold uppercase tracking-wider text-[#166534] mr-2">
+                      <div className="text-[11px] font-bold uppercase tracking-wider text-[#166534] mb-0.5">
                         {faq.tag}
-                      </span>
-                      <h3 className="text-base sm:text-lg font-semibold text-[#191C1E] inline">
+                      </div>
+                      <h3 className="text-base sm:text-lg font-semibold text-[#191C1E]">
                         {faq.question}
                       </h3>
                     </div>

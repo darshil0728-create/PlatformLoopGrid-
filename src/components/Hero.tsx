@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Leaf, Cpu, Sparkles, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Sparkles, ShieldCheck, TrendingUp, ShoppingCart, Package } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 interface HeroProps {
@@ -17,7 +17,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenJoinModal }) => {
         <div className="absolute top-24 right-1/4 w-80 h-80 rounded-full bg-[#E0F2FE]" />
       </div>
 
-      <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         {/* Pill Badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E8F5E9] border border-[#C8E6C9] text-xs font-semibold text-[#1B5E20] mb-8 shadow-xs">
           <Sparkles className="w-3.5 h-3.5 text-[#2E7D32]" />
@@ -55,44 +55,65 @@ export const Hero: React.FC<HeroProps> = ({ onOpenJoinModal }) => {
         </div>
 
         {/* Key Feature Pillars (Minimalist Cards, NO dashboards or data matrix) */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
-          {/* Card 1 */}
-          <div className="p-6 rounded-2xl bg-white border border-neutral-200/80 shadow-xs hover:border-[#81C784]/60 transition-all">
-            <div className="w-10 h-10 rounded-xl bg-[#E8F5E9] flex items-center justify-center text-[#1B5E20] mb-4">
-              <Leaf className="w-5 h-5" />
+        <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 text-left">
+          {/* Card 1: Categorized Lots & DRPs */}
+          <div className="p-6 rounded-2xl bg-white border border-neutral-200/80 shadow-xs hover:border-[#81C784]/60 transition-all flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-[#E8F5E9] flex items-center justify-center text-[#1B5E20] mb-4">
+                <Package className="w-5 h-5" />
+              </div>
+              <h3 className="text-base font-semibold text-[#191C1E]">
+                {t.hero.card1Title}
+              </h3>
+              <p className="mt-2 text-xs sm:text-sm text-neutral-600 leading-normal">
+                {t.hero.card1Desc}
+              </p>
             </div>
-            <h3 className="text-base font-semibold text-[#191C1E]">
-              {t.hero.card1Title}
-            </h3>
-            <p className="mt-2 text-sm text-neutral-600 leading-normal">
-              {t.hero.card1Desc}
-            </p>
           </div>
 
-          {/* Card 2 */}
-          <div className="p-6 rounded-2xl bg-white border border-neutral-200/80 shadow-xs hover:border-[#81C784]/60 transition-all">
-            <div className="w-10 h-10 rounded-xl bg-[#E0F2FE] flex items-center justify-center text-[#0284C7] mb-4">
-              <Cpu className="w-5 h-5" />
+          {/* Card 2: Live Prices Exchange */}
+          <div className="p-6 rounded-2xl bg-white border border-neutral-200/80 shadow-xs hover:border-[#81C784]/60 transition-all flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-[#E0F2FE] flex items-center justify-center text-[#0284C7] mb-4">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+              <h3 className="text-base font-semibold text-[#191C1E]">
+                {t.hero.card2Title}
+              </h3>
+              <p className="mt-2 text-xs sm:text-sm text-neutral-600 leading-normal">
+                {t.hero.card2Desc}
+              </p>
             </div>
-            <h3 className="text-base font-semibold text-[#191C1E]">
-              {t.hero.card2Title}
-            </h3>
-            <p className="mt-2 text-sm text-neutral-600 leading-normal">
-              {t.hero.card2Desc}
-            </p>
           </div>
 
-          {/* Card 3 */}
-          <div className="p-6 rounded-2xl bg-white border border-neutral-200/80 shadow-xs hover:border-[#81C784]/60 transition-all">
-            <div className="w-10 h-10 rounded-xl bg-[#F3E8FF] flex items-center justify-center text-[#7E22CE] mb-4">
-              <ShieldCheck className="w-5 h-5" />
+          {/* Card 3: Marketplace & Credit Facility */}
+          <div className="p-6 rounded-2xl bg-white border border-neutral-200/80 shadow-xs hover:border-[#81C784]/60 transition-all flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-[#FEF3C7] flex items-center justify-center text-[#B45309] mb-4">
+                <ShoppingCart className="w-5 h-5" />
+              </div>
+              <h3 className="text-base font-semibold text-[#191C1E]">
+                {t.hero.card3Title}
+              </h3>
+              <p className="mt-2 text-xs sm:text-sm text-neutral-600 leading-normal">
+                {t.hero.card3Desc}
+              </p>
             </div>
-            <h3 className="text-base font-semibold text-[#191C1E]">
-              {t.hero.card3Title}
-            </h3>
-            <p className="mt-2 text-sm text-neutral-600 leading-normal">
-              {t.hero.card3Desc}
-            </p>
+          </div>
+
+          {/* Card 4: Compliance & Green MSME Center */}
+          <div className="p-6 rounded-2xl bg-white border border-neutral-200/80 shadow-xs hover:border-[#81C784]/60 transition-all flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-[#F3E8FF] flex items-center justify-center text-[#7E22CE] mb-4">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <h3 className="text-base font-semibold text-[#191C1E]">
+                {t.hero.card4Title || 'Compliance & Green MSME Center'}
+              </h3>
+              <p className="mt-2 text-xs sm:text-sm text-neutral-600 leading-normal">
+                {t.hero.card4Desc || '100-point statutory compliance scoring, CPCB Form-10 manifests, and official ZED certification subsidies up to 80%.'}
+              </p>
+            </div>
           </div>
         </div>
       </div>

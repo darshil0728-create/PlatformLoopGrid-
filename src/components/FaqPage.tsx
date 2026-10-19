@@ -23,6 +23,9 @@ export const FaqPage: React.FC<FaqPageProps> = ({
     { id: 'all', label: t.faqPage.catAll },
     { id: 'registration', label: t.faqPage.catReg },
     { id: 'inventory', label: t.faqPage.catInv },
+    { id: 'prices', label: t.faqPage.catPrices || 'Live Prices (₹/kg)' },
+    { id: 'marketplace', label: t.faqPage.catMarketplace || 'Marketplace & Credit' },
+    { id: 'compliance', label: t.faqPage.catCompliance || 'Compliance & Govt Schemes' },
     { id: 'transit', label: t.faqPage.catTransit },
     { id: 'settlement', label: t.faqPage.catSettlement },
     { id: 'processing', label: t.faqPage.catProcessing },
@@ -152,9 +155,9 @@ export const FaqPage: React.FC<FaqPageProps> = ({
                     aria-expanded={isOpen}
                   >
                     <div>
-                      <span className="inline-block px-2.5 py-0.5 rounded text-[11px] font-semibold bg-[#F0FDF4] text-[#166534] border border-[#DCFCE7] mb-1.5">
+                      <div className="text-[11px] font-bold tracking-wider uppercase text-[#1B5E20] mb-1">
                         {faq.categoryLabel}
-                      </span>
+                      </div>
                       <h3 className="text-base sm:text-lg font-semibold text-[#191C1E] block">
                         {faq.question}
                       </h3>
