@@ -102,7 +102,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenJoinModal }) => {
           </div>
 
           {/* Card 4: Compliance & Green MSME Center */}
-          <div className="p-6 rounded-2xl bg-white border border-neutral-200/80 shadow-xs hover:border-[#81C784]/60 transition-all flex flex-col justify-between">
+          <div className="p-6 rounded-2xl bg-white border border-neutral-200/80 shadow-xs hover:border-[#81C784]/60 transition-all flex flex-col justify-between text-left">
             <div>
               <div className="w-10 h-10 rounded-xl bg-[#F3E8FF] flex items-center justify-center text-[#7E22CE] mb-4">
                 <ShieldCheck className="w-5 h-5" />

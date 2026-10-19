@@ -19,6 +19,7 @@ import { FaqPage } from './components/FaqPage';
 import { SupportPage } from './components/SupportPage';
 import { AuthPage } from './components/AuthPage';
 import { ProfilePage, EnterpriseProfile } from './components/ProfilePage';
+import { ComplianceScorePage } from './components/profile/ComplianceScorePage';
 import { EarlyAccessModal } from './components/EarlyAccessModal';
 import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { Footer } from './components/Footer';
@@ -26,7 +27,7 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 
 function MainAppContent() {
   const { t } = useLanguage();
-  const [currentPage, setCurrentPage] = useState<'landing' | 'faq' | 'support' | 'auth' | 'profile'>('landing');
+  const [currentPage, setCurrentPage] = useState<'landing' | 'faq' | 'support' | 'auth' | 'profile' | 'compliance'>('landing');
   const [userProfile, setUserProfile] = useState<EnterpriseProfile | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalRole, setModalRole] = useState<'msme_supplier' | 'processing_buyer' | 'transit_partner'>('msme_supplier');
@@ -70,6 +71,10 @@ function MainAppContent() {
     setCurrentPage('profile');
   };
 
+  const handleNavigateToCompliance = () => {
+    setCurrentPage('compliance');
+  };
+
   // Called when enterprise finishes the CREATE AN ACCOUNT FORM (or logs in)
   const handleAccountCreated = (profile: EnterpriseProfile) => {
     setUserProfile(profile);
@@ -81,6 +86,30 @@ function MainAppContent() {
     setUserProfile(null);
     setCurrentPage('landing');
   };
+
+  // Render Full-Page Compliance view (Only accessible when locked in / logged in)
+  if (currentPage === 'compliance') {
+    if (!userProfile) {
+      // Compliance requires the user to be logged in / locked in
+      setCurrentPage('auth');
+      return null;
+    }
+
+    return (
+      <>
+        <ComplianceScorePage
+          profile={userProfile}
+          onReturnToDashboard={handleNavigateToHome}
+        />
+        <EarlyAccessModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          initialRole={modalRole}
+          enterpriseProfile={userProfile}
+        />
+      </>
+    );
+  }
 
   // Render Full-Page FAQ view
   if (currentPage === 'faq') {
@@ -184,7 +213,9 @@ function MainAppContent() {
       {/* Main Content */}
       <main className="flex-grow">
         {/* Hero Section */}
-        <Hero onOpenJoinModal={() => handleRegisterResource('msme_supplier')} />
+        <Hero
+          onOpenJoinModal={() => handleRegisterResource('msme_supplier')}
+        />
 
         {/* The Problem: MSME Operational Scrap */}
         <ProblemSection />

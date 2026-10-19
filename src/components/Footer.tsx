@@ -8,7 +8,11 @@ interface FooterProps {
   onNavigateToSupport?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigateToFaq, onNavigateToAuth, onNavigateToSupport }) => {
+export const Footer: React.FC<FooterProps> = ({
+  onNavigateToFaq,
+  onNavigateToAuth,
+  onNavigateToSupport,
+}) => {
   const { t } = useLanguage();
 
   return (

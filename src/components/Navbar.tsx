@@ -12,7 +12,7 @@ interface NavbarProps {
   onNavigateToHome: () => void;
   onNavigateToProfile?: () => void;
   userProfile?: EnterpriseProfile | null;
-  currentPage: 'landing' | 'faq' | 'support' | 'auth' | 'profile';
+  currentPage: 'landing' | 'faq' | 'support' | 'auth' | 'profile' | 'compliance';
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
